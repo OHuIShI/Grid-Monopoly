@@ -37,7 +37,7 @@ io.on('connection', function(socket){
         player.position.x = data.position.x;
         player.position.y = data.position.y;
 
-        socket.broadcast.to(connection.lobby.id).emit('updatePosition', player);
+        socket.broadcast.emit('updatePosition', player);
     });
 
     socket.on('disconnect', function(){
