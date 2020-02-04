@@ -44,5 +44,7 @@ io.on('connection', function(socket){
         console.log('A player has disconnected');
         delete players[thisPlayerID];
         delete sockets[thisPlayerID];
+
+        socket.broadcast.emit('disconnected', player);
     });
 });
