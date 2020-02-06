@@ -18,7 +18,8 @@ io.on('connection', function(socket){
 
     let player = new Player();
     let thisPlayerID = player.id;
-    players[thisPlayerID] = player.id;
+
+    players[thisPlayerID] = player;
     sockets[thisPlayerID] = socket;
 
     //Tell the client that this is our id for the server
@@ -44,7 +45,6 @@ io.on('connection', function(socket){
         console.log('A player has disconnected');
         delete players[thisPlayerID];
         delete sockets[thisPlayerID];
-
         socket.broadcast.emit('disconnected', player);
     });
 });
