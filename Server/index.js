@@ -98,7 +98,6 @@ io.on('connection', function(socket){
         gameManager.MaxPlayer = gameManager.MaxPlayer - 1;
         delete players[thisPlayerID];
         delete sockets[thisPlayerID];
-
         socket.broadcast.emit('disconnected', player);
     });
 });
