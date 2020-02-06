@@ -40,7 +40,8 @@ io.on('connection', function(socket){
 
     // 첫 번째 turn 정하기
     // lobby가 생기면 바꿔야 하는 부분
-    if (players.length() == 1) {
+    if (gameManager.MaxPlayer == 1) {
+        console.log('UPDATETURN');
         players[thisPlayerID].SetIsMyTurn(true);
         gameManager.turnIndex = 0;
         let returnData = {
