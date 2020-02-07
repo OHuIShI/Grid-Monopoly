@@ -3,6 +3,7 @@ module.exports = class GameManager {
         this.lapsToGo = new Number(4);
         this.turnIndex = new Number(-1);
         this.MaxPlayer = new Number(0);
+        this.mapLength = new Number(5);
     }
 
     updateTurnIndex() {

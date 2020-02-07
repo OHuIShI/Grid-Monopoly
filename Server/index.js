@@ -80,19 +80,73 @@ io.on('connection', function(socket){
     // 주사위 굴려주기
     socket.on('rollDices', function () {
         console.log('rollDices');
-        let returnData = {
+        let distDice = Math.floor(Math.random()*(2*gameManager.mapLength)) + 1;
+        let dirDice = Math.floor(Math.random()*(4));
+        let x=player.position.x; // 당장 가야할 x
+        let y=player.position.y; // 당장 가야할 y
+        let maxLength=parseInt(gameManager.mapLength/2);
+        let minLength=maxLength*(-1);
+        let dist = distDice; // 남은 거리 이동 횟수
+        let dir = dirDice;
 
+        switch(dir){
+            case 0: {
+                y+=dist;
+                if(y>maxLength){
+                    dist -= maxLength;
+                    y = maxLength;
+                } else dist = 0;
+                break;
+            }
+            case 1: {
+                x+=dist;
+                if(x>maxLength){
+                    dist -= maxLength;
+                    x = maxLength;
+                } else dist = 0;
+                break;
+            }
+            case 2: {
+                y-=dist; 
+                if(y<minLength){
+                    dist = Math.abs(dist - minLength);
+                    y = minLength;
+                } else dist = 0;
+                break;
+            }
+            case 3: {
+                x-=dist;
+                if(x<minLength){
+                    dist = Math.abs(dist - minLength);
+                    x = minLength;
+                } else dist = 0;
+                break;
+            } 
         }
+        
+        let dx = Math.abs(x - player.position.x);
+        let dy = Math.abs(y - player.position.y);
+
+        let returnData = {
+            id: thisPlayerID,
+            DIR: dirDice, // 방향주사위 눈
+            DIST: distDice, // 거리주사위 눈
+            dx: dx, // 당장 가야할 dx
+            dy: dy, // 당장 가야할 dy
+            dist: dist // 남은 거리 이동 횟수
+        }
+
+        console.log(returnData);
         socket.emit('updatePosition', returnData);
         socket.broadcast.emit('updatePosition', returnData);
     });
 
-    socket.on('updatePosition', function(data) {
-        player.position.x = data.position.x;
-        player.position.y = data.position.y;
+    // socket.on('updatePosition', function(data) {
+    //     player.position.x = data.position.x;
+    //     player.position.y = data.position.y;
 
-        socket.broadcast.emit('updatePosition', player);
-    });
+    //     socket.broadcast.emit('updatePosition', player);
+    // });
 
     socket.on('disconnect', function(){
         console.log('A player has disconnected');
