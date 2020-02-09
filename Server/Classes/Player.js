@@ -22,7 +22,7 @@ module.exports = class Player {
 
     updatePosition(data) {
         // hoxy 몰라서 체크 한번..나중에 지워도 됨
-        if(id!== this.id){
+        if(data.id!== this.id){
             console.log('different id!');
         }
         this.position.x = data.x;
@@ -30,5 +30,9 @@ module.exports = class Player {
         this.dirDice = data.DIR;
         this.distDice = data.DIST;
         this.dist = data.dist;
+    }
+
+    showPlayerData() {
+        console.log(JSON.stringify(this));
     }
 }

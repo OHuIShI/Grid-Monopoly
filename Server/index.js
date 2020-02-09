@@ -138,6 +138,7 @@ io.on('connection', function(socket){
         
         player.updatePosition(returnData);
         console.log(returnData);
+        player.showPlayerData();
         socket.emit('updatePosition', returnData);
         socket.broadcast.emit('updatePosition', returnData);
     });
@@ -151,7 +152,7 @@ io.on('connection', function(socket){
 
     socket.on('selectDirection', function(data){
         console.log('selectDir');
-
+        
     });
 
     socket.on('disconnect', function(){
