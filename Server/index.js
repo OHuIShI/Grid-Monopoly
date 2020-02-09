@@ -57,17 +57,19 @@ io.on('connection', function(socket){
 
         if (gameManager.lapsToGo > 0) {
             let nextTurnIndex = gameManager.updateTurnIndex();
+            console.log('nextTurnIndex: ' + nextTurnIndex);
+            console.log('nextTurnPlayerId: ' + playersID[nextTurnIndex]);
             let nextTurnID = players[playersID[nextTurnIndex]].id;
 
             let returnData = {
                 id: nextTurnID,
                 lapsToGo: gameManager.lapsToGo
             }
-
+            console.log(returnData);
             socket.emit('updateTurn', returnData);
             socket.broadcast.emit('updateTurn', returnData);
         } else {
-
+            console.log('gameOver');
             let returnData = {
                 // 게임 결과
             }
@@ -152,6 +154,7 @@ io.on('connection', function(socket){
 
     socket.on('selectDirection', function(data){
         console.log('selectDir');
+        console.log(data);
         let distDice = player.distDice;
         let dirDice = player.dirDice;
         let x=player.position.x; // 당장 가야할 x
@@ -216,6 +219,8 @@ io.on('connection', function(socket){
     socket.on('disconnect', function(){
         console.log('A player has disconnected');
         gameManager.MaxPlayer = gameManager.MaxPlayer - 1;
+        let index = playersID.indexOf(players[thisPlayerID].id);
+        playersID.splice(index, 1);
         delete players[thisPlayerID];
         delete sockets[thisPlayerID];
         socket.broadcast.emit('disconnected', player);
