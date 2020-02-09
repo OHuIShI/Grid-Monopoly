@@ -135,7 +135,8 @@ io.on('connection', function(socket){
             y: y, // 당장 가야할 y
             dist: dist // 남은 거리 이동 횟수
         }
-
+        
+        player.updatePosition(returnData);
         console.log(returnData);
         socket.emit('updatePosition', returnData);
         socket.broadcast.emit('updatePosition', returnData);
