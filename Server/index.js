@@ -109,7 +109,7 @@ io.on('connection', function(socket){
             case 2: {
                 y-=dist; 
                 if(y<minLength){
-                    dist = Math.abs(dist - minLength);
+                    dist -= maxLength;
                     y = minLength;
                 } else dist = 0;
                 break;
@@ -117,7 +117,7 @@ io.on('connection', function(socket){
             case 3: {
                 x-=dist;
                 if(x<minLength){
-                    dist = Math.abs(dist - minLength);
+                    dist -= maxLength;
                     x = minLength;
                 } else dist = 0;
                 break;
@@ -149,7 +149,8 @@ io.on('connection', function(socket){
     // });
 
     socket.on('selectDirection', function(data){
-        console.log('selectDir')
+        console.log('selectDir');
+
     });
 
     socket.on('disconnect', function(){
