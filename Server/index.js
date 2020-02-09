@@ -131,8 +131,8 @@ io.on('connection', function(socket){
             id: thisPlayerID,
             DIR: dirDice, // 방향주사위 눈
             DIST: distDice, // 거리주사위 눈
-            dx: dx, // 당장 가야할 dx
-            dy: dy, // 당장 가야할 dy
+            x: x, // 당장 가야할 x
+            y: y, // 당장 가야할 y
             dist: dist // 남은 거리 이동 횟수
         }
 
