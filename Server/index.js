@@ -23,6 +23,8 @@ io.on('connection', function(socket){
     let thisPlayerID = player.id;
     players[thisPlayerID] = player;
     playersID.push(thisPlayerID);
+    player.order = playersID.indexOf(players[thisPlayerID].id); // 매치에서 플레이어 순서 -> lobby 생기면 logic 바꿔야함
+    console.log('player order: '+ player.order);
     gameManager.MaxPlayer = gameManager.MaxPlayer + 1; // maxPlayer 수 현재상황에서는 동적임
     sockets[thisPlayerID] = socket;
 

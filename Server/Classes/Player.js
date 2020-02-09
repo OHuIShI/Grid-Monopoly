@@ -5,6 +5,7 @@ module.exports = class Player {
     constructor() {
         this.username = '';
         this.id = shortID.generate();
+        this.order = -1;
         this.position = new Vector2();
         this.isMyTurn = false;
         this.dirDice = new Number(0); // player가 굴린 방향주사위 눈
