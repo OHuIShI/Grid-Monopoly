@@ -148,6 +148,10 @@ io.on('connection', function(socket){
     //     socket.broadcast.emit('updatePosition', player);
     // });
 
+    socket.on('selectDirection', function(data){
+        console.log('selectDir')
+    });
+
     socket.on('disconnect', function(){
         console.log('A player has disconnected');
         gameManager.MaxPlayer = gameManager.MaxPlayer - 1;
