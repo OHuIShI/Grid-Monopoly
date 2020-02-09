@@ -152,7 +152,65 @@ io.on('connection', function(socket){
 
     socket.on('selectDirection', function(data){
         console.log('selectDir');
+        let distDice = player.distDice;
+        let dirDice = player.dirDice;
+        let x=player.position.x; // 당장 가야할 x
+        let y=player.position.y; // 당장 가야할 y
+        let maxLength=parseInt(gameManager.mapLength/2);
+        let minLength=maxLength*(-1);
+        let dist = player.dist; // 남은 거리 이동 횟수
+        let dir = data.selectedDIR;
+
+        switch(dir){
+            case 0: {
+                y+=dist;
+                if(y>maxLength){
+                    dist -= maxLength;
+                    y = maxLength;
+                } else dist = 0;
+                break;
+            }
+            case 1: {
+                x+=dist;
+                if(x>maxLength){
+                    dist -= maxLength;
+                    x = maxLength;
+                } else dist = 0;
+                break;
+            }
+            case 2: {
+                y-=dist; 
+                if(y<minLength){
+                    dist -= maxLength;
+                    y = minLength;
+                } else dist = 0;
+                break;
+            }
+            case 3: {
+                x-=dist;
+                if(x<minLength){
+                    dist -= maxLength;
+                    x = minLength;
+                } else dist = 0;
+                break;
+            } 
+        }
+
+        let returnData = {
+            id: thisPlayerID,
+            DIR: dirDice, // 방향주사위 눈
+            DIST: distDice, // 거리주사위 눈
+            x: x, // 당장 가야할 x
+            y: y, // 당장 가야할 y
+            dist: dist // 남은 거리 이동 횟수
+        }
         
+        player.updatePosition(returnData);
+        console.log(returnData);
+        player.showPlayerData();
+        socket.emit('updatePosition', returnData);
+        socket.broadcast.emit('updatePosition', returnData);
+
     });
 
     socket.on('disconnect', function(){
