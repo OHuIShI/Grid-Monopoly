@@ -2,6 +2,7 @@ let io = require('socket.io')(process.env.PORT || 52300);
 //let Server = require('./Classes/Server')
 let Player = require('./Classes/Player.js');
 let GameManager = require('./Classes/GameManager.js');
+let LandManager = require('./Classes/LandManager.js');
 
 console.log('Server has started');
 
@@ -9,6 +10,7 @@ let players = [];
 let playersID = [];
 let sockets = [];
 let gameManager = new GameManager();
+let landManager = new LandManager();
 /*
 let server = new Server();
 
@@ -28,8 +30,26 @@ io.on('connection', function(socket){
     gameManager.MaxPlayer = gameManager.MaxPlayer + 1; // maxPlayer 수 현재상황에서는 동적임
     sockets[thisPlayerID] = socket;
 
+    // landManager 예시
+    let landData = [
+        {
+            id: 1,
+            name: "hospital"
+
+        },
+        {
+            id: 2,
+            name: "apartment"
+        },
+        {
+            id: 3,
+            name: "busStation"
+        }
+
+    ]
+
     //Tell the client that this is our id for the server
-    socket.emit('register', {id: thisPlayerID});
+    socket.emit('register', {id: thisPlayerID, landData : landData});
     socket.emit('spawn', player); //Tell myself I have spawned
     socket.broadcast.emit('spawn', player); //Tell other I have spawned
 
