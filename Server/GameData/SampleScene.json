@@ -74,155 +74,155 @@
         },
         {
             "id": 9,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 10,
-            "name": "",
+            "name": "school",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 10,
+                "building": 100,
+                "contract": 1000
             }
         },
         {
             "id": 11,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 12,
-            "name": "",
+            "name": "apartment",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 7,
+                "building": 70,
+                "contract": 700
             }
         },
         {
             "id": 13,
-            "name": "",
+            "name": "apartment",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 7,
+                "building": 70,
+                "contract": 700
             }
         },
         {
             "id": 14,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 15,
-            "name": "",
+            "name": "apartment",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 7,
+                "building": 70,
+                "contract": 700
             }
         },
         {
             "id": 16,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 17,
-            "name": "",
+            "name": "apartment",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 7,
+                "building": 70,
+                "contract": 700
             }
         },
         {
             "id": 18,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 19,
-            "name": "",
+            "name": "apartment",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 7,
+                "building": 70,
+                "contract": 700
             }
         },
         {
             "id": 20,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 21,
-            "name": "",
+            "name": "busStation",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 3,
+                "building": 30,
+                "contract": 300
             }
         },
         {
             "id": 22,
-            "name": "",
+            "name": "apartment",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 7,
+                "building": 70,
+                "contract": 700
             }
         },
         {
             "id": 23,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         },
         {
             "id": 24,
-            "name": "",
+            "name": "busStation",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 3,
+                "building": 30,
+                "contract": 300
             }
         },
         {
             "id": 25,
-            "name": "",
+            "name": "cafe",
             "price": {
-                "land": 0,
-                "building": 0,
-                "contract": 0
+                "land": 9,
+                "building": 90,
+                "contract": 900
             }
         }
     ]
