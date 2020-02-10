@@ -1,0 +1,229 @@
+{
+    "landData": [
+        {
+            "id": 1,
+            "name": "hospital",
+            "price": {
+                "land": 1,
+                "building": 10,
+                "contract": 100
+            }
+        },
+        {
+            "id": 2,
+            "name": "supermarket",
+            "price": {
+                "land": 2,
+                "building": 20,
+                "contract": 200
+            }
+        },
+        {
+            "id": 3,
+            "name": "busStation",
+            "price": {
+                "land": 3,
+                "building": 30,
+                "contract": 300
+            }
+        },
+        {
+            "id": 4,
+            "name": "apartment",
+            "price": {
+                "land": 4,
+                "building": 40,
+                "contract": 400
+            }
+        },
+        {
+            "id": 5,
+            "name": "cafe",
+            "price": {
+                "land": 5,
+                "building": 50,
+                "contract": 500
+            }
+        },
+        {
+            "id": 6,
+            "name": "cafe",
+            "price": {
+                "land": 6,
+                "building": 60,
+                "contract": 600
+            }
+        },
+        {
+            "id": 7,
+            "name": "apartment",
+            "price": {
+                "land": 7,
+                "building": 70,
+                "contract": 700
+            }
+        },
+        {
+            "id": 8,
+            "name": "supermarket",
+            "price": {
+                "land": 8,
+                "building": 80,
+                "contract": 800
+            }
+        },
+        {
+            "id": 9,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 10,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 11,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 12,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 13,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 14,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 15,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 16,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 17,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 18,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 19,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 20,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 21,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 22,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 23,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 24,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        },
+        {
+            "id": 25,
+            "name": "",
+            "price": {
+                "land": 0,
+                "building": 0,
+                "contract": 0
+            }
+        }
+    ]
+}

@@ -31,6 +31,7 @@ io.on('connection', function(socket){
     sockets[thisPlayerID] = socket;
 
     // landManager 예시
+
     let landData = [
         {
             id: 1,
@@ -47,6 +48,7 @@ io.on('connection', function(socket){
         }
 
     ]
+
 
     //Tell the client that this is our id for the server
     socket.emit('register', {id: thisPlayerID, landData : landData});

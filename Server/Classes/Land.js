@@ -2,17 +2,17 @@ module.exports = class Land {
     constructor() {
         this.id = new Number(-1);
         this.name = '';
-        this.ownerID = new Number(-1);
-        this.price = new Array(
-            { colName: 'land', value:Number(0)},
-            { colName: 'building', value:Number(0)},
-            { colName: 'contract', value:Number(0)},
-        ),
-        this.status = new Array(
-            { colName: 'land', value:Boolean(false)},
-            { colName: 'building', value:Boolean(false)},
-            { colName: 'contract', value:Boolean(false)},
-        ),
+        this.ownerID = '';
+        this.price = {
+            land: new Number(0),
+            building: new Number(0),
+            contract: new Number(0)
+        },
+            this.status = {
+            land: new Boolean(false),
+            building: new Boolean(false),
+            contract: new Boolean(false)
+        }
         this.totalValue = new Number(0)
     }
 
