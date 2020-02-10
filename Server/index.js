@@ -52,7 +52,7 @@ io.on('connection', function(socket){
 */
     
     //Tell the client that this is our id for the server
-    socket.emit('register', {id: thisPlayerID, landData : landManager.landData});
+    socket.emit('register', {id: thisPlayerID, items : landManager.landData});
     socket.emit('spawn', player); //Tell myself I have spawned
     socket.broadcast.emit('spawn', player); //Tell other I have spawned
 
