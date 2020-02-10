@@ -13,16 +13,11 @@ module.exports = class LandManager {
             this.landData[i].id = initialLandData['landData'][i].id;
             this.landData[i].name = initialLandData['landData'][i].name;
 
-            this.landData[i].price.land = initialLandData['landData'][i].price.land;
-            this.landData[i].price.building = initialLandData['landData'][i].price.building;
-            this.landData[i].price.contract = initialLandData['landData'][i].price.contract;
+            for (let key in this.landData[i].price)
+            {
+                this.landData[i].price[key] = initialLandData['landData'][i].price[key];
+            }
         }
-            
-        
-        //console.log(initialLandData);
-        //console.log(initialLandData['landData'][0].price);
-        // console.log('print landmanager');
-        // console.log(this.landData);
     }
 
     InitializeLandData() {

@@ -11,6 +11,7 @@ let playersID = [];
 let sockets = [];
 let gameManager = new GameManager();
 let landManager = new LandManager();
+// console.log(landManager.landData);
 /*
 let server = new Server();
 
@@ -49,7 +50,7 @@ io.on('connection', function(socket){
 
     ]
 */
-    //console.log(landManager.landData);
+    
     //Tell the client that this is our id for the server
     socket.emit('register', {id: thisPlayerID, landData : landManager.landData});
     socket.emit('spawn', player); //Tell myself I have spawned
