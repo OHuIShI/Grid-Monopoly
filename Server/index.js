@@ -3,6 +3,7 @@ let io = require('socket.io')(process.env.PORT || 52300);
 let Player = require('./Classes/Player.js');
 let GameManager = require('./Classes/GameManager.js');
 let LandManager = require('./Classes/LandManager.js');
+let initialGameData = require('../GameData/SampleScene.json');
 
 console.log('Server has started');
 
@@ -27,29 +28,10 @@ io.on('connection', function(socket){
     players[thisPlayerID] = player;
     playersID.push(thisPlayerID);
     player.order = playersID.indexOf(players[thisPlayerID].id); // 매치에서 플레이어 순서 -> lobby 생기면 logic 바꿔야함
+    player.balance = initialGameData['initialBalance'];
     console.log('player order: '+ player.order);
     gameManager.MaxPlayer = gameManager.MaxPlayer + 1; // maxPlayer 수 현재상황에서는 동적임
     sockets[thisPlayerID] = socket;
-
-    // landManager 예시
-/*
-    let landData = [
-        {
-            id: 1,
-            name: "hospital"
-
-        },
-        {
-            id: 2,
-            name: "apartment"
-        },
-        {
-            id: 3,
-            name: "busStation"
-        }
-
-    ]
-*/
     
     //Tell the client that this is our id for the server
     socket.emit('register', {id: thisPlayerID, items : landManager.landData});
@@ -169,13 +151,6 @@ io.on('connection', function(socket){
         socket.emit('updatePosition', returnData);
         socket.broadcast.emit('updatePosition', returnData);
     });
-
-    // socket.on('updatePosition', function(data) {
-    //     player.position.x = data.position.x;
-    //     player.position.y = data.position.y;
-
-    //     socket.broadcast.emit('updatePosition', player);
-    // });
 
     socket.on('selectDirection', function(data){
         console.log('selectDir');

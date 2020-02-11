@@ -1,6 +1,6 @@
 let Land = require('./Land.js');
 let GameManager = require('./GameManager.js');
-let initialLandData = require('../GameData/SampleScene.json');
+let initialGameData = require('../GameData/SampleScene.json');
 
 module.exports = class LandManager {
     constructor() {
@@ -10,12 +10,12 @@ module.exports = class LandManager {
         {
             this.landData[i] = new Land();
 
-            this.landData[i].id = initialLandData['landData'][i].id;
-            this.landData[i].name = initialLandData['landData'][i].name;
+            this.landData[i].id = initialGameData['landData'][i].id;
+            this.landData[i].name = initialGameData['landData'][i].name;
 
             for (let key in this.landData[i].price)
             {
-                this.landData[i].price[key] = initialLandData['landData'][i].price[key];
+                this.landData[i].price[key] = initialGameData['landData'][i].price[key];
             }
         }
     }

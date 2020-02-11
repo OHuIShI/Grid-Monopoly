@@ -1,4 +1,5 @@
 {
+    "initialBalance": 50000,
     "landData": [
         {
             "id": 1,

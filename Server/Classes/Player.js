@@ -11,6 +11,8 @@ module.exports = class Player {
         this.dirDice = new Number(0); // player가 굴린 방향주사위 눈
         this.distDice = new Number(0); // 방향주사위 눈
         this.dist = new Number(0); // player의 남은 이동 횟수
+        this.balance = new Number(0);
+        this.assets = new Number(0);
     }
 
     IsMyTurn() {
