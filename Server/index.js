@@ -3,7 +3,7 @@ let io = require('socket.io')(process.env.PORT || 52300);
 let Player = require('./Classes/Player.js');
 let GameManager = require('./Classes/GameManager.js');
 let LandManager = require('./Classes/LandManager.js');
-let initialGameData = require('../GameData/SampleScene.json');
+let initialGameData = require('./GameData/SampleScene.json');
 
 console.log('Server has started');
 
