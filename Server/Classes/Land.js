@@ -23,7 +23,7 @@ module.exports = class Land {
         for (let key in this.status)
         {
             if (this.status[key])
-                total += this.price[key];   
+                total += this.price[key];
         }
 
         this.totalValue = total;
