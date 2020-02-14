@@ -22,8 +22,12 @@ module.exports = class Land {
         // 더하기 로직
         for (let key in this.status)
         {
-            if (this.status[key])
-                total += this.price[key];   
+            console.log(key);
+            if (this.status[key]){
+                console.log("HIHI");
+                total += this.price[key]; 
+            }
+                  
         }
 
         this.totalValue = total;
