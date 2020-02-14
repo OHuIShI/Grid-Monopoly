@@ -218,6 +218,7 @@ io.on('connection', function(socket){
 
     socket.on('updateLandData', function (data) {
         console.log('updateLandData');
+        let landIndex = data.landIndex;
         let state = data.state;
         let id = data.id;
         
@@ -233,6 +234,9 @@ io.on('connection', function(socket){
                 break;
         }
 
+        landManager.landData[landIndex].calculateTotalValue();
+        data['totalValue'] = landManager.landData[landIndex].totalValue;
+        console.log('change totalValue :' + data['totalValue']);
         socket.emit('updateLandData', data);
         socket.broadcast.emit('updateLandData', data);
     });
