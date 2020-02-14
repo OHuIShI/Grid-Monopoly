@@ -225,10 +225,11 @@ io.on('connection', function(socket){
         switch (state)
         {
             case "BuyLand":
+                landManager.landData[landIndex].ownerID = id;
+                landManager.landData[landIndex].status.land = true;
                 break;
             case "Building":
-                landManager.landData[landIndex].ownerID = id;
-                landManager.landData[landIndex].state.building = true;
+                landManager.landData[landIndex].status.building = true;
                 break;
             case "Contract":
                 break;

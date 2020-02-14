@@ -9,9 +9,9 @@ module.exports = class Land {
             contract: new Number(0)
         },
             this.status = {
-            land: new Boolean(false),
-            building: new Boolean(false),
-            contract: new Boolean(false)
+            land: false,
+            building: false,
+            contract: false
         }
         this.totalValue = new Number(0)
     }
@@ -22,9 +22,7 @@ module.exports = class Land {
         // 더하기 로직
         for (let key in this.status)
         {
-            console.log(key);
             if (this.status[key]){
-                console.log("HIHI");
                 total += this.price[key]; 
             }
                 
