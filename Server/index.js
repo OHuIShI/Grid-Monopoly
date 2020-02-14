@@ -216,11 +216,29 @@ io.on('connection', function(socket){
 
     });
 
-    socket.on('updateBuildingData', function (data) {
+    socket.on('updateLandData', function (data) {
+        console.log('updateLandData');
+        let state = data.state;
+        let id = data.id;
         
+        switch (state)
+        {
+            case "BuyLand":
+                break;
+            case "Building":
+                break;
+            case "Contract":
+                break;
+            case "Acquire":
+                break;
+        }
+
+        socket.emit('updateLandData', data);
+        socket.broadcast.emit('updateLandData', data);
     });
 
     socket.on('updateBalance', function (data) {
+        console.log('updateBalance');
         let senderID = data.senderID;
         let receiverID = data.receiverID;
         let cost = data.cost;
@@ -232,7 +250,6 @@ io.on('connection', function(socket){
             players[receiverID].balance += cost;
         }
 
-        console.log('updateBalance');
         socket.emit('updateBalance', data);
         socket.broadcast.emit('updateBalance', data);
     });
