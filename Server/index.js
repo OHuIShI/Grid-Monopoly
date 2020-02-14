@@ -89,7 +89,8 @@ io.on('connection', function(socket){
     // 주사위 굴려주기
     socket.on('rollDices', function () {
         console.log('rollDices');
-        let distDice = Math.floor(Math.random()*(2*gameManager.mapLength)) + 1;
+        //let distDice = Math.floor(Math.random() * (2 * gameManager.mapLength)) + 1;
+        let distDice = 0;
         let dirDice = Math.floor(Math.random()*(4));
         let x=player.position.x; // 당장 가야할 x
         let y=player.position.y; // 당장 가야할 y
@@ -225,20 +226,23 @@ io.on('connection', function(socket){
         switch (state)
         {
             case "BuyLand":
+                console.log("BuyLand");
                 landManager.landData[landIndex].ownerID = id;
                 landManager.landData[landIndex].status.land = true;
                 break;
             case "Building":
+                console.log("Building");
                 landManager.landData[landIndex].status.building = true;
                 break;
             case "Contract":
+                console.log("Contract");
                 landManager.landData[landIndex].status.contract = true;
                 break;
             case "Acquire":
+                console.log("Acquire");
                 landManager.landData[landIndex].ownerID = id;
                 break;
         }
-
         landManager.landData[landIndex].calculateTotalValue();
         data['totalValue'] = landManager.landData[landIndex].totalValue;
         console.log('change totalValue :' + data['totalValue']);
