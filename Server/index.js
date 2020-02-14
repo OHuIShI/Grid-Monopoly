@@ -234,6 +234,7 @@ io.on('connection', function(socket){
             case "Contract":
                 break;
             case "Acquire":
+                landManager.landData[landIndex].ownerID = id;
                 break;
         }
 
