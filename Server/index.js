@@ -216,6 +216,27 @@ io.on('connection', function(socket){
 
     });
 
+    socket.on('updateBuildingData', function (data) {
+        
+    });
+
+    socket.on('updateBalance', function (data) {
+        let senderID = data.senderID;
+        let receiverID = data.receiverID;
+        let cost = data.cost;
+        
+        players[senderID].balance -= cost;
+
+        if (receiverID != "")
+        {
+            players[receiverID].balance += cost;
+        }
+
+        console.log('updateBalance');
+        socket.emit('updateBalance', data);
+        socket.broadcast.emit('updateBalance', data);
+    });
+    
     socket.on('disconnect', function(){
         console.log('A player has disconnected');
         gameManager.MaxPlayer = gameManager.MaxPlayer - 1;
