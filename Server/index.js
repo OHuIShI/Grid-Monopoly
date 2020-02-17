@@ -222,6 +222,7 @@ io.on('connection', function(socket){
         let landIndex = data.landIndex;
         let state = data.state;
         let id = data.id;
+        let prevOwnerID = 0;
         
         switch (state)
         {
@@ -229,21 +230,49 @@ io.on('connection', function(socket){
                 console.log("BuyLand");
                 landManager.landData[landIndex].ownerID = id;
                 landManager.landData[landIndex].status.land = true;
+                landManager.landData[landIndex].calculateTotalValue();
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
+                data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 break;
             case "Building":
                 console.log("Building");
                 landManager.landData[landIndex].status.building = true;
+                landManager.landData[landIndex].calculateTotalValue();
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
+                data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 break;
             case "Contract":
                 console.log("Contract");
                 landManager.landData[landIndex].status.contract = true;
+                landManager.landData[landIndex].calculateTotalValue();
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
+                data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 break;
             case "Acquire":
                 console.log("Acquire");
+                prevOwnerID = landManager.landData[landIndex].ownerID;
+                players[prevOwnerID].assets -= landManager.landData[landIndex].totalValue;
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
                 landManager.landData[landIndex].ownerID = id;
+                data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
+                data['prevOwnerId'] = prevOwnerID;
+                data['prevOwnerAssets'] = players[prevOwnerID].assets;
+                break;
+            case "Sell":
+                console.log("Sell");
+                prevOwnerID = landManager.landData[landIndex].ownerID;
+                players[prevOwnerID].assets -= landManager.landData[landIndex].totalValue;
+
+                landManager.landData[landIndex].ownerID = id;
+                for (let key in landManager.landData[landIndex].status)
+                {
+                    landManager.landData[landIndex].status.key = false;    
+                }
+                landManager.landData[landIndex].calculateTotalValue();
+                data['prevOwnerId'] = prevOwnerID;
+                data['prevOwnerAssets'] = players[prevOwnerID].assets;
                 break;
         }
-        landManager.landData[landIndex].calculateTotalValue();
         data['totalValue'] = landManager.landData[landIndex].totalValue;
         console.log('change totalValue :' + data['totalValue']);
         socket.emit('updateLandData', data);
@@ -255,13 +284,21 @@ io.on('connection', function(socket){
         let senderID = data.senderID;
         let receiverID = data.receiverID;
         let cost = data.cost;
-        
-        players[senderID].balance -= cost;
 
+        if (senderID != "")
+        {
+            players[senderID].balance -= cost;
+            players[senderID].assets -= cost;
+            data['senderAssets'] = players[senderID].assets;
+        }
+        
         if (receiverID != "")
         {
             players[receiverID].balance += cost;
+            players[receiverID].assets += cost;
+            data['receiverAssets'] = players[receiverID].assets;
         }
+        
 
         socket.emit('updateBalance', data);
         socket.broadcast.emit('updateBalance', data);

@@ -4,20 +4,20 @@ module.exports = class Land {
         this.name = '';
         this.ownerID = '';
         this.price = {
-            land: new Number(0),
-            building: new Number(0),
-            contract: new Number(0)
+            land: 0,
+            building: 0,
+            contract: 0
         },
             this.status = {
             land: false,
             building: false,
             contract: false
         }
-        this.totalValue = new Number(0)
+        this.totalValue = 0;
     }
 
     calculateTotalValue() {
-        let total = new Number(0);
+        let total = 0;
 
         // 더하기 로직
         for (let key in this.status)
@@ -27,7 +27,9 @@ module.exports = class Land {
             }
                 
         }
-
+        if (total == 0)
+            total = this.price.land;
+        
         this.totalValue = total;
     }
 }
