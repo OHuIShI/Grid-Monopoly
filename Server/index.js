@@ -76,9 +76,15 @@ io.on('connection', function(socket){
             socket.emit('updateTurn', returnData);
             socket.broadcast.emit('updateTurn', returnData);
         } else {
-            console.log('gameOver');
+            let winnerIndex = 0;
+            for(let i=0;i<gameManager.MaxPlayer;i++){
+                if(players[playersID[i]].assets > players[playersID[winnerIndex]].assets){
+                    winnerIndex = i;
+                }
+            }
+            console.log('gameOver, winner: ', playerID[winnerIndex]);
             let returnData = {
-                // 게임 결과
+                winner: playerID[winnerIndex]
             }
             socket.emit('gameOver', returnData);
             socket.broadcast.emit('gameOver', returnData);
@@ -298,7 +304,6 @@ io.on('connection', function(socket){
             players[receiverID].assets += cost;
             data['receiverAssets'] = players[receiverID].assets;
         }
-        
 
         socket.emit('updateBalance', data);
         socket.broadcast.emit('updateBalance', data);
