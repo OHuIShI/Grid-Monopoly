@@ -83,9 +83,9 @@ io.on('connection', function(socket){
                     winnerIndex = i;
                 }
             }
-            console.log('gameOver, winner: ', playerID[winnerIndex]);
+            console.log('gameOver, winner: ', players[playersID[winnerIndex]].id);
             let returnData = {
-                winner: playerID[winnerIndex]
+                winner: players[playersID[winnerIndex]].id
             }
             socket.emit('gameOver', returnData);
             socket.broadcast.emit('gameOver', returnData);
@@ -96,8 +96,8 @@ io.on('connection', function(socket){
     // 주사위 굴려주기
     socket.on('rollDices', function () {
         console.log('rollDices');
-        let distDice = Math.floor(Math.random() * (2 * gameManager.mapLength)) + 1;
-        //let distDice = 0;
+        //let distDice = Math.floor(Math.random() * (2 * gameManager.mapLength)) + 1;
+        let distDice = 0;
         let dirDice = Math.floor(Math.random()*(4));
         let x=player.position.x; // 당장 가야할 x
         let y=player.position.y; // 당장 가야할 y

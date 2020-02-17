@@ -1,6 +1,6 @@
 module.exports = class GameManager {
     constructor() {
-        this.lapsToGo = new Number(100);
+        this.lapsToGo = new Number(5);
         this.turnIndex = new Number(-1);
         this.MaxPlayer = new Number(0);
         this.mapLength = new Number(5);
