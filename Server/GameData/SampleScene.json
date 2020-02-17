@@ -114,7 +114,7 @@
             "name": "apartment",
             "price": {
                 "land": 7,
-                "building": 70,
+                "building": 40,
                 "contract": 700
             }
         },
