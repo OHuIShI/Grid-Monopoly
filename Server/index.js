@@ -29,6 +29,7 @@ io.on('connection', function(socket){
     playersID.push(thisPlayerID);
     player.order = playersID.indexOf(players[thisPlayerID].id); // 매치에서 플레이어 순서 -> lobby 생기면 logic 바꿔야함
     player.balance = initialGameData['initialBalance'];
+    player.assets = initialGameData['initialBalance'];
     console.log('player order: '+ player.order);
     gameManager.MaxPlayer = gameManager.MaxPlayer + 1; // maxPlayer 수 현재상황에서는 동적임
     sockets[thisPlayerID] = socket;
@@ -95,8 +96,8 @@ io.on('connection', function(socket){
     // 주사위 굴려주기
     socket.on('rollDices', function () {
         console.log('rollDices');
-        //let distDice = Math.floor(Math.random() * (2 * gameManager.mapLength)) + 1;
-        let distDice = 0;
+        let distDice = Math.floor(Math.random() * (2 * gameManager.mapLength)) + 1;
+        //let distDice = 0;
         let dirDice = Math.floor(Math.random()*(4));
         let x=player.position.x; // 당장 가야할 x
         let y=player.position.y; // 당장 가야할 y
@@ -237,29 +238,29 @@ io.on('connection', function(socket){
                 landManager.landData[landIndex].ownerID = id;
                 landManager.landData[landIndex].status.land = true;
                 landManager.landData[landIndex].calculateTotalValue();
-                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].price.land;
                 data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 break;
             case "Building":
                 console.log("Building");
                 landManager.landData[landIndex].status.building = true;
                 landManager.landData[landIndex].calculateTotalValue();
-                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].price.building;
                 data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 break;
             case "Contract":
                 console.log("Contract");
                 landManager.landData[landIndex].status.contract = true;
                 landManager.landData[landIndex].calculateTotalValue();
-                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].price.contract;
                 data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 break;
             case "Acquire":
                 console.log("Acquire");
                 prevOwnerID = landManager.landData[landIndex].ownerID;
                 players[prevOwnerID].assets -= landManager.landData[landIndex].totalValue;
-                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
                 landManager.landData[landIndex].ownerID = id;
+                players[landManager.landData[landIndex].ownerID].assets += landManager.landData[landIndex].totalValue;
                 data['ownerAssets'] = players[landManager.landData[landIndex].ownerID].assets;
                 data['prevOwnerId'] = prevOwnerID;
                 data['prevOwnerAssets'] = players[prevOwnerID].assets;
@@ -290,18 +291,31 @@ io.on('connection', function(socket){
         let senderID = data.senderID;
         let receiverID = data.receiverID;
         let cost = data.cost;
+        console.log('cost = ' + cost);
 
         if (senderID != "")
         {
+            console.log('before update sender');
+            console.log('sender balance = ' + players[senderID].balance);
+            console.log('sender assets = ' + players[senderID].assets);
             players[senderID].balance -= cost;
             players[senderID].assets -= cost;
+            console.log('after update sender');
+            console.log('sender balance = ' + players[senderID].balance);
+            console.log('sender assets = ' + players[senderID].assets);
             data['senderAssets'] = players[senderID].assets;
         }
         
         if (receiverID != "")
         {
+            console.log('before update receiver');
+            console.log('receiver balance = ' + players[receiverID].balance);
+            console.log('receiver assets = ' + players[receiverID].assets);
             players[receiverID].balance += cost;
             players[receiverID].assets += cost;
+            console.log('after update receiver');
+            console.log('receiver balance = ' + players[receiverID].balance);
+            console.log('receiver assets = ' + players[receiverID].assets);
             data['receiverAssets'] = players[receiverID].assets;
         }
 
