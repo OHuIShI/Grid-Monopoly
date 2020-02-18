@@ -59,6 +59,34 @@ io.on('connection', function(socket){
         socket.emit('updateTurn', returnData);
     }
 
+    socket.on('GoBankrupt', function (data) {
+        console.log('GoBankrupt');
+        let id = data.id;
+        
+        players[id].assets = 0;
+        players[id].balance = 0;
+
+        for (var i = 0; i < this.landData.length; i++)
+        {
+            this.landData[i].ownerID = "";
+            
+            for (let key in this.landData[i].status)
+                this.landData[i].status[key] = false;
+        }
+        this.landData[i].totalValue = 0;
+
+        let playerIndex = playersID.findIndex(id);
+        players.splice(playerIndex, 1);
+        gameManager.MaxPlayer = gameManager.MaxPlayer - 1;
+
+        gameManager.afterBankrupt = true;
+
+        console.log(players);
+        
+        socket.emit('GoBankrupt', data);
+        socket.broadcast.emit('GoBankrupt', data);
+    });
+
     socket.on('turnOver', function () {
         console.log('turnOver');
         gameManager.lapsToGo = gameManager.lapsToGo - 1;
@@ -154,7 +182,6 @@ io.on('connection', function(socket){
         }
         
         player.updatePosition(returnData);
-        console.log(returnData);
         player.showPlayerData();
         socket.emit('updatePosition', returnData);
         socket.broadcast.emit('updatePosition', returnData);
@@ -162,7 +189,6 @@ io.on('connection', function(socket){
 
     socket.on('selectDirection', function(data){
         console.log('selectDir');
-        console.log(data);
         let distDice = player.distDice;
         let dirDice = player.dirDice;
         let x=player.position.x; // 당장 가야할 x
@@ -217,7 +243,6 @@ io.on('connection', function(socket){
         }
         
         player.updatePosition(returnData);
-        console.log(returnData);
         player.showPlayerData();
         socket.emit('updatePosition', returnData);
         socket.broadcast.emit('updatePosition', returnData);
@@ -281,7 +306,6 @@ io.on('connection', function(socket){
                 break;
         }
         data['totalValue'] = landManager.landData[landIndex].totalValue;
-        console.log('change totalValue :' + data['totalValue']);
         socket.emit('updateLandData', data);
         socket.broadcast.emit('updateLandData', data);
     });
@@ -291,31 +315,18 @@ io.on('connection', function(socket){
         let senderID = data.senderID;
         let receiverID = data.receiverID;
         let cost = data.cost;
-        console.log('cost = ' + cost);
 
         if (senderID != "")
         {
-            console.log('before update sender');
-            console.log('sender balance = ' + players[senderID].balance);
-            console.log('sender assets = ' + players[senderID].assets);
             players[senderID].balance -= cost;
             players[senderID].assets -= cost;
-            console.log('after update sender');
-            console.log('sender balance = ' + players[senderID].balance);
-            console.log('sender assets = ' + players[senderID].assets);
             data['senderAssets'] = players[senderID].assets;
         }
         
         if (receiverID != "")
         {
-            console.log('before update receiver');
-            console.log('receiver balance = ' + players[receiverID].balance);
-            console.log('receiver assets = ' + players[receiverID].assets);
             players[receiverID].balance += cost;
             players[receiverID].assets += cost;
-            console.log('after update receiver');
-            console.log('receiver balance = ' + players[receiverID].balance);
-            console.log('receiver assets = ' + players[receiverID].assets);
             data['receiverAssets'] = players[receiverID].assets;
         }
 
