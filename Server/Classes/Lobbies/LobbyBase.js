@@ -15,7 +15,8 @@ module.exports = class LobbyBase {
 
         console.log('Player ' + player.displayerPlayerInformation() + ' has entered the lobby (' + lobby.id + ')');
 
-        lobby.connections.push(connection);
+        //lobby.connections.push(connection);
+        lobby.connections[connection.player.id] = connection;
 
         player.lobby = lobby.id;
         connection.lobby = lobby;

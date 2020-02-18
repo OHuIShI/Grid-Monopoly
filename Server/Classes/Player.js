@@ -5,6 +5,7 @@ module.exports = class Player {
     constructor() {
         this.username = '';
         this.id = shortID.generate();
+        this.lobby = 0;
         this.order = -1;
         this.position = new Vector2();
         this.isMyTurn = false;
