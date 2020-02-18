@@ -65,23 +65,20 @@ io.on('connection', function(socket){
         
         players[id].assets = 0;
         players[id].balance = 0;
-
-        for (var i = 0; i < this.landData.length; i++)
+        for (var i = 0; i < landManager.landData.length; i++)
         {
-            this.landData[i].ownerID = "";
+            landManager.landData[i].ownerID = "";
+            landManager.landData[i].totalValue = 0;
             
-            for (let key in this.landData[i].status)
-                this.landData[i].status[key] = false;
+            for (let key in landManager.landData[i].status)
+            landManager.landData[i].status[key] = false;
         }
-        this.landData[i].totalValue = 0;
 
-        let playerIndex = playersID.findIndex(id);
-        players.splice(playerIndex, 1);
+        let playerIndex = playersID.indexOf(id);
+        playersID.splice(playerIndex, 1);
         gameManager.MaxPlayer = gameManager.MaxPlayer - 1;
 
         gameManager.afterBankrupt = true;
-
-        console.log(players);
         
         socket.emit('GoBankrupt', data);
         socket.broadcast.emit('GoBankrupt', data);
@@ -92,18 +89,27 @@ io.on('connection', function(socket){
         gameManager.lapsToGo = gameManager.lapsToGo - 1;
 
         if (gameManager.lapsToGo > 0) {
-            let nextTurnIndex = gameManager.updateTurnIndex();
-            console.log('nextTurnIndex: ' + nextTurnIndex);
-            console.log('nextTurnPlayerId: ' + playersID[nextTurnIndex]);
-            let nextTurnID = players[playersID[nextTurnIndex]].id;
+            if (playersID.length == 1)
+            {
+                let returnData = {
+                    winner: players[playersID[0]].id
+                }
+                socket.emit('gameOver', returnData);
+                socket.broadcast.emit('gameOver', returnData);
+            } else {
+                let nextTurnIndex = gameManager.updateTurnIndex();
+                console.log('nextTurnIndex: ' + nextTurnIndex);
+                console.log('nextTurnPlayerId: ' + playersID[nextTurnIndex]);
+                let nextTurnID = players[playersID[nextTurnIndex]].id;
 
-            let returnData = {
-                id: nextTurnID,
-                lapsToGo: gameManager.lapsToGo
-            }
-            console.log(returnData);
-            socket.emit('updateTurn', returnData);
-            socket.broadcast.emit('updateTurn', returnData);
+                let returnData = {
+                    id: nextTurnID,
+                    lapsToGo: gameManager.lapsToGo
+                }
+                console.log(returnData);
+                socket.emit('updateTurn', returnData);
+                socket.broadcast.emit('updateTurn', returnData);
+                }
         } else {
             let winnerIndex = 0;
             for(let i=0;i<gameManager.MaxPlayer;i++){
