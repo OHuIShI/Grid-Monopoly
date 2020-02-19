@@ -55,6 +55,18 @@ module.exports = class GameLobbby extends LobbyBase {
         //Example: loot, perhaps flying bullets etc
     }
 
+    removePlayer(connection = Connection) {
+        let lobby = this;
+
+        lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer - 1;
+        let index = lobby.playersID.indexOf(connection.player.id);
+        lobby.playersID.splice(index, 1);
+
+        connection.socket.broadcast.to(lobby.id).emit('disconnected', {
+            id: connection.player.id
+        });
+    }
+
     initializeGameSetting() {
         connection.socket.emit('initializeGameSetting', { items: landManager.landData });
     }
@@ -65,43 +77,39 @@ module.exports = class GameLobbby extends LobbyBase {
         let socket = connection.socket;
         let player = connection.player;
 
-        playersID.push(player.id);
-        player.order = playersID.indexOf(player.id);
+        lobby.playersID.push(player.id);
+        player.order = lobby.playersID.indexOf(player.id);
         player.balance = initialGameData['initialBalance'];
         player.assets = initialGameData['initialBalance'];
 
-        gameManager.CurrentPlayer = gameManager.CurrentPlayer + 1;
+        lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer + 1;
 
         socket.emit('spawn', player); //tell myself I have spawned
         socket.broadcast.to(lobby.id).emit('spawn', player); // Tell others
 
+        console.log("tell myself about everyone else");
+        console.log(connections);
+
         //Tell myself about everyone else already in the lobby
         connections.forEach(c => {
+            console.log("check");
             if (c.player.id != connection.player.id) {
+                console.log("spawn emit");
                 socket.emit('spawn', c.player);
             }
         });
 
-        if (gameManager.CurrentPlayer == 1) {
+        if (lobby.gameManager.CurrentPlayer == 1) {
             console.log('UPDATETURN');
-            players[thisPlayerID].SetIsMyTurn(true);
-            gameManager.turnIndex = 0;
+            connections[player.id].player.SetIsMyTurn(true);
+            lobby.gameManager.turnIndex = 0;
             let returnData = {
-                id: thisPlayerID,
-                lapsToGo: gameManager.lapsToGo
+                id: player.id,
+                lapsToGo: lobby.gameManager.lapsToGo
             }
             socket.emit('updateTurn', returnData);
         }
     }
-
-    removePlayer(connection = Connection) {
-        let lobby = this;
-
-        connection.socket.broadcast.to(lobby.id).emit('disconnected', {
-            id: connection.player.id
-        });
-    }
-
 
     updateBalance(connection = Connection, data) {
         console.log('updateBalance');
@@ -190,16 +198,16 @@ module.exports = class GameLobbby extends LobbyBase {
         gameManager.lapsToGo = gameManager.lapsToGo - 1;
 
         if (gameManager.lapsToGo > 0) {
-            if (playersID.length == 1) {
+            if (lobby.playersID.length == 1) {
                 let returnData = {
-                    winner: connections[playersID[0]].player.id
+                    winner: connections[lobby.playersID[0]].player.id
                 }
                 connection.socket.emit('gameOver', returnData);
                 connection.socket.broadcast.to(lobby.id).emit('gameOver', returnData);
             } else {
                 let nextTurnIndex = gameManager.updateTurnIndex();
                 console.log('nextTurnIndex: ' + nextTurnIndex);
-                console.log('nextTurnPlayerId: ' + playersID[nextTurnIndex]);
+                console.log('nextTurnPlayerId: ' + lobby.playersID[nextTurnIndex]);
                 let nextTurnID = connections[playersID[nextTurnIndex]].player.id;
 
                 let returnData = {

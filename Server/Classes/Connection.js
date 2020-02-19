@@ -51,12 +51,7 @@ module.exports = class Connection {
         
         socket.on('disconnect', function(){
             console.log('A player has disconnected');
-            gameManager.CurrentPlayer = gameManager.CurrentPlayer - 1;
-            let index = playersID.indexOf(players[thisPlayerID].id);
-            playersID.splice(index, 1);
-            delete players[thisPlayerID];
-            delete sockets[thisPlayerID];
-            socket.broadcast.emit('disconnected', player);
+            server.onDisconnected(connection);
         });
     }
 }

@@ -36,6 +36,11 @@ module.exports = class Player {
         this.dist = data.dist;
     }
 
+    displayerPlayerInformation() {
+        let player = this;
+        return '(' + player.username + ':' + player.id + ')';
+    }
+
     showPlayerData() {
         console.log(JSON.stringify(this));
     }
