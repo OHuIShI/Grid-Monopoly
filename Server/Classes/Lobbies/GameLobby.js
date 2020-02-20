@@ -40,7 +40,7 @@ module.exports = class GameLobbby extends LobbyBase {
 
         lobby.addPlayer(connection);
 
-        lobby.initializeGameSetting();
+        lobby.initializeGameSetting(connection);
 
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
@@ -69,8 +69,9 @@ module.exports = class GameLobbby extends LobbyBase {
         });
     }
 
-    initializeGameSetting() {
-        connection.socket.emit('initializeGameSetting', { items: landManager.landData });
+    initializeGameSetting(connection = Connection) {
+        let lobby = this;
+        connection.socket.emit('initializeGameSetting', { items: lobby.landManager.landData });
     }
 
     addPlayer(connection = Connection) {
@@ -92,14 +93,26 @@ module.exports = class GameLobbby extends LobbyBase {
         console.log("tell myself about everyone else");
         console.log(connections);
 
+        for (let c in connections)
+        {
+            console.log("check");
+            console.log(c);
+            if (connections[c].player.id != connection.player.id) {
+                console.log("spawn emit");
+                socket.emit('spawn', connections[c].player);
+            }
+        }
+
         //Tell myself about everyone else already in the lobby
+        /*
         connections.forEach(c => {
             console.log("check");
-            if (c.player.id != connection.player.id) {
+            if (connections[c].player.id != connection.player.id) {
                 console.log("spawn emit");
                 socket.emit('spawn', c.player);
             }
         });
+        */
 
         if (lobby.gameManager.CurrentPlayer == 1) {
             console.log('UPDATETURN');
