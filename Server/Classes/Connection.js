@@ -23,11 +23,11 @@ module.exports = class Connection {
 
         //gameLobby
         socket.on('GoBankrupt', function (data) {
-            connection.lobby.GoBankrupt(data);
+            connection.lobby.GoBankrupt(connection, data);
         });
         
         socket.on('turnOver', function () {
-            connection.lobby.turnOver();
+            connection.lobby.turnOver(connection);
         });
     
         //gameLobby
