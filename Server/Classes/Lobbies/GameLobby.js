@@ -261,8 +261,8 @@ module.exports = class GameLobbby extends LobbyBase {
     rollDices(connection = Connection) {
         let lobby = this;
         console.log('rollDices');
-        //let distDice = Math.floor(Math.random() * (2 * gameManager.mapLength)) + 1;
-        let distDice = 0;
+        let distDice = Math.floor(Math.random() * (2 * lobby.gameManager.mapLength)) + 1;
+        //let distDice = 0;
         let dirDice = Math.floor(Math.random() * (4));
         let x = connection.player.position.x; // 당장 가야할 x
         let y = connection.player.position.y; // 당장 가야할 y
@@ -409,8 +409,8 @@ module.exports = class GameLobbby extends LobbyBase {
                 dist: dist // 남은 거리 이동 횟수
             }
             
-            player.updatePosition(returnData);
-            player.showPlayerData();
+            connection.player.updatePosition(returnData);
+            connection.player.showPlayerData();
             connection.socket.emit('updatePosition', returnData);
             connection.socket.broadcast.to(lobby.id).emit('updatePosition', returnData);
     }
