@@ -357,15 +357,14 @@ module.exports = class GameLobbby extends LobbyBase {
         let lobby = this;
         console.log('selectDir');
             let distDice = connection.player.distDice;
-            let dirDice = connection.player.dirDice;
+            let dirDice = data.selectedDIR;
             let x = connection.player.position.x; // 당장 가야할 x
             let y = connection.player.position.y; // 당장 가야할 y
             let maxLength=parseInt(lobby.gameManager.mapLength/2);
             let minLength=maxLength*(-1);
             let dist = connection.player.dist; // 남은 거리 이동 횟수
-            let dir = data.selectedDIR;
     
-            switch(dir){
+            switch(dirDice){
                 case 0: {
                     y+=dist;
                     if(y>maxLength){

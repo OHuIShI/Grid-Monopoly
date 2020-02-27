@@ -29,6 +29,7 @@ module.exports = class Player {
         if(data.id!== this.id){
             console.log('different id!');
         }
+        console.log(data.DIR);
         this.position.x = data.x;
         this.position.y = data.y;
         this.dirDice = data.DIR;
