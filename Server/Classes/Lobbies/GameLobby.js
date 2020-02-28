@@ -35,12 +35,17 @@ module.exports = class GameLobbby extends LobbyBase {
 
     onEnterLobby(connection = Connection) {
         let lobby = this;
+        let socket = connection.socket;
 
         super.onEnterLobby(connection);
 
         lobby.addPlayer(connection);
 
+        socket.emit('loadGame');
+
+        // 이거 나중에 게임로비 만들면 호출하는 위치 바꿔야할듯
         lobby.initializeGameSetting(connection);
+
 
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
