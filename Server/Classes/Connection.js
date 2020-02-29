@@ -21,6 +21,10 @@ module.exports = class Connection {
             server.onAttemptToJoinGame(connection);
         });
 
+        socket.on('enteredGame', function () {
+            connection.lobby.initialSetting(connection);
+        });
+
         //gameLobby
         socket.on('GoBankrupt', function (data) {
             connection.lobby.GoBankrupt(connection, data);

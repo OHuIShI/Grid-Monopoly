@@ -34,18 +34,40 @@ module.exports = class GameLobbby extends LobbyBase {
     }
 
     onEnterLobby(connection = Connection) {
-        let lobby = this;
         let socket = connection.socket;
+        let player = connection.player;
 
         super.onEnterLobby(connection);
 
-        lobby.addPlayer(connection);
+        let returnData = {
+            id: player.id
+        }
+        console.log(returnData.id);
 
-        socket.emit('loadGame');
+        socket.emit('loadGame', returnData);
+        /*
+        // initialSetting으로 떼간 부분
+        console.log("initialSetting");
+        let lobby = this;
+
+        lobby.addPlayer(connection);
 
         // 이거 나중에 게임로비 만들면 호출하는 위치 바꿔야할듯
         lobby.initializeGameSetting(connection);
 
+        //Handle spawning any server spawned objects here
+        //Example: loot, perhaps flying bullets etc
+        */
+    }
+
+    initialSetting(connection = Connection) {
+        console.log("initialSetting");
+        let lobby = this;
+
+        lobby.addPlayer(connection);
+
+        // 이거 나중에 게임로비 만들면 호출하는 위치 바꿔야할듯
+        lobby.initializeGameSetting(connection);
 
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
