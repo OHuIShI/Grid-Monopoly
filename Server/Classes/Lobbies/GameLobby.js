@@ -84,7 +84,7 @@ module.exports = class GameLobbby extends LobbyBase {
     onSpawnAllPlayersIntoGame(connection = Connection) {
         let lobby = this;
         let connections = lobby.connections;
-        console.log("SPAWN하라고쫌");
+        //console.log("SPAWN하라고쫌");
         // connections.forEach(connection => {
         //     console.log('addPlayer : '+connection.id);
         //     lobby.addPlayer(connection);
@@ -136,7 +136,7 @@ module.exports = class GameLobbby extends LobbyBase {
         player.balance = initialGameData['initialBalance'];
         player.assets = initialGameData['initialBalance'];
 
-        //lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer + 1;
+        lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer + 1;
 
         socket.emit('spawn', player); //tell myself I have spawned
         //이걸 게임로비를 만들면 주석풀고 활용해야할듯 spawn말고 게임로비에 들어왔다는 신호로
@@ -163,8 +163,8 @@ module.exports = class GameLobbby extends LobbyBase {
             }
         });
         */
-
-        if (lobby.gameManager.CurrentPlayer == 1) {
+        console.log("# of players:"+lobby.gameManager.CurrentPlayer);
+        if (lobby.gameManager.CurrentPlayer == lobby.settings.maxPlayers) {
             console.log('UPDATETURN');
             connections[player.id].player.SetIsMyTurn(true);
             lobby.gameManager.turnIndex = 0;
