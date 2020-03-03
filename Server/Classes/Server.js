@@ -59,7 +59,8 @@ module.exports = class Server {
 
         //Preform lobby clean up
         let currentLobbyIndex = connection.player.lobby;
-        server.lobbys[connection.player.lobby].onLeaveLobby(connection);
+        //server.lobbys[connection.player.lobby].onLeaveLobby(connection);
+        server.lobbys[currentLobbyIndex].onLeaveLobby(connection);
 
         if(server.lobbys[currentLobbyIndex] != 0 && server.lobbys[currentLobbyIndex].connections.length == 0){
             console.log('Closing down lobby ('+currentLobbyIndex+')');

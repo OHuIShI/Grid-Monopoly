@@ -73,7 +73,7 @@ module.exports = class GameLobbby extends LobbyBase {
         let lobby = this;
 
         //lobby.addPlayer(connection);
-        lobby.onSpawnAllPlayersIntoGame();
+        lobby.onSpawnAllPlayersIntoGame(connection);
 
         lobby.initializeGameSetting(connection);
 
@@ -81,7 +81,7 @@ module.exports = class GameLobbby extends LobbyBase {
         //Example: loot, perhaps flying bullets etc
     }
 
-    onSpawnAllPlayersIntoGame() {
+    onSpawnAllPlayersIntoGame(connection = Connection) {
         let lobby = this;
         let connections = lobby.connections;
         console.log("SPAWN하라고쫌");
@@ -89,10 +89,12 @@ module.exports = class GameLobbby extends LobbyBase {
         //     console.log('addPlayer : '+connection.id);
         //     lobby.addPlayer(connection);
         // });
-        for (let c in connections)
-        {
-            lobby.addPlayer(connections[c]);
-        }
+        // for (let c in connections)
+        // {
+        //     console.log("HIHI");
+        //     lobby.addPlayer(connections[c]);
+        // }
+        lobby.addPlayer(connection);
     }
 
     onLeaveLobby(connection = Connection) {
@@ -140,13 +142,13 @@ module.exports = class GameLobbby extends LobbyBase {
         //이걸 게임로비를 만들면 주석풀고 활용해야할듯 spawn말고 게임로비에 들어왔다는 신호로
         //socket.broadcast.to(lobby.id).emit('spawn', player); // Tell others
 
-        console.log("tell myself about everyone else");
+        console.log("tell myself about everyone else:" + player.id);
         //console.log(connections);
 
         for (let c in connections)
         { 
-            if (connections[c].player.id != connection.player.id) {
-                console.log("spawn emit");
+            if (connections[c].player.id != player.id) {
+                console.log("spawn emit:"+connections[c].player.id);
                 socket.emit('spawn', connections[c].player);
             }
         }
