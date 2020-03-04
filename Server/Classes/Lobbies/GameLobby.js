@@ -54,8 +54,8 @@ module.exports = class GameLobbby extends LobbyBase {
             // spawn 전에 loadGame 부르고 씬 로딩되기 기다려야함
             socket.emit('loadGame');
             socket.broadcast.to(lobby.id).emit('loadGame');
-            // TODO : Spawn all players in
-            //lobby.onSpawnAllPlayersIntoGame();
+            // TODO : Spawn all players in   
+            lobby.onSpawnAllPlayersIntoGame(connection);
         }
 
         let returnLobbyData = {
@@ -72,11 +72,8 @@ module.exports = class GameLobbby extends LobbyBase {
         console.log("initialSetting");
         let lobby = this;
 
-        //lobby.addPlayer(connection);
-        lobby.onSpawnAllPlayersIntoGame(connection);
-
         lobby.initializeGameSetting(connection);
-
+        lobby.addPlayer(connection);
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }
@@ -94,7 +91,32 @@ module.exports = class GameLobbby extends LobbyBase {
         //     console.log("HIHI");
         //     lobby.addPlayer(connections[c]);
         // }
-        lobby.addPlayer(connection);
+        // add all players to playersID(turn order array)
+        for (let c in connections)
+        { 
+            lobby.playersID.push(connections[c].player.id);
+        }
+        // console.log('before shuffle : ');
+        // for (let i in lobby.playersID){
+        //     console.log(lobby.playersID[i]);
+        // }
+        // shuffle turn order
+        for (let i = lobby.settings.maxPlayers - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [lobby.playersID[i], lobby.playersID[j]] = [lobby.playersID[j], lobby.playersID[i]];
+        }
+        // console.log('after:');
+        // for (let i in lobby.playersID){
+        //     console.log(lobby.playersID[i]);
+            
+        // }
+        // set all players' initial settings
+        for (let c in connections)
+        { 
+            connections[c].player.order = lobby.playersID.indexOf(connections[c].player.id);
+            connections[c].player.balance = initialGameData['initialBalance'];
+            connections[c].player.assets = initialGameData['initialBalance'];
+        }
     }
 
     onLeaveLobby(connection = Connection) {
@@ -131,19 +153,17 @@ module.exports = class GameLobbby extends LobbyBase {
         let socket = connection.socket;
         let player = connection.player;
 
-        lobby.playersID.push(player.id);
-        player.order = lobby.playersID.indexOf(player.id);
-        player.balance = initialGameData['initialBalance'];
-        player.assets = initialGameData['initialBalance'];
+        //player.order = lobby.playersID.indexOf(player.id);
+        //player.balance = initialGameData['initialBalance'];
+        //player.assets = initialGameData['initialBalance'];
 
         lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer + 1;
-
+        //console.log('My order:'+player.order);
         socket.emit('spawn', player); //tell myself I have spawned
         //이걸 게임로비를 만들면 주석풀고 활용해야할듯 spawn말고 게임로비에 들어왔다는 신호로
         //socket.broadcast.to(lobby.id).emit('spawn', player); // Tell others
 
         console.log("tell myself about everyone else:" + player.id);
-        //console.log(connections);
 
         for (let c in connections)
         { 
@@ -163,16 +183,19 @@ module.exports = class GameLobbby extends LobbyBase {
             }
         });
         */
-        console.log("# of players:"+lobby.gameManager.CurrentPlayer);
+        //console.log("# of players:"+lobby.gameManager.CurrentPlayer);
         if (lobby.gameManager.CurrentPlayer == lobby.settings.maxPlayers) {
             console.log('UPDATETURN');
-            connections[player.id].player.SetIsMyTurn(true);
+            connections[lobby.playersID[0]].player.SetIsMyTurn(true);
+            console.log(lobby.playersID[0]+'\'s TURN');
+            console.log(connections[lobby.playersID[0]].player.isMyTurn);
+            console.log(connections[lobby.playersID[1]].player.isMyTurn);
             lobby.gameManager.turnIndex = 0;
             let returnData = {
-                id: player.id,
+                id: lobby.playersID[0],
                 lapsToGo: lobby.gameManager.lapsToGo
             }
-            socket.emit('updateTurn', returnData);
+            connections[lobby.playersID[0]].socket.emit('updateTurn', returnData);
         }
     }
 
