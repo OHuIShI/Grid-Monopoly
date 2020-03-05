@@ -283,7 +283,7 @@ module.exports = class GameLobbby extends LobbyBase {
         }
         data['totalValue'] = landManager.landData[landIndex].totalValue;
         connection.socket.emit('updateLandData', data);
-        connection.socket.broadcast.emit('updateLandData', data);
+        connection.socket.broadcast.to(lobby.id).emit('updateLandData', data);
     }
 
     turnOver(connection = Connection) {
@@ -335,8 +335,9 @@ module.exports = class GameLobbby extends LobbyBase {
         let lobby = this;
         console.log('rollDices');
         let distDice = Math.floor(Math.random() * (2 * lobby.gameManager.mapLength)) + 1;
-        //let distDice = 0;
+        //let distDice = 100;
         let dirDice = Math.floor(Math.random() * (4));
+        //let dirDice = 0;
         let x = connection.player.position.x; // 당장 가야할 x
         let y = connection.player.position.y; // 당장 가야할 y
         let maxLength = parseInt(lobby.gameManager.mapLength / 2);
@@ -348,32 +349,36 @@ module.exports = class GameLobbby extends LobbyBase {
             case 0: {
                 y += dist;
                 if (y > maxLength) {
-                    dist -= maxLength;
+                    //dist -= maxLength;
                     y = maxLength;
+                    dist -= Math.abs(y - connection.player.position.y);
                 } else dist = 0;
                 break;
             }
             case 1: {
                 x += dist;
                 if (x > maxLength) {
-                    dist -= maxLength;
+                    //dist -= maxLength;
                     x = maxLength;
+                    dist -= Math.abs(x - connection.player.position.x);
                 } else dist = 0;
                 break;
             }
             case 2: {
                 y -= dist;
                 if (y < minLength) {
-                    dist -= maxLength;
+                    //dist -= maxLength;
                     y = minLength;
+                    dist -= Math.abs(y - connection.player.position.y);
                 } else dist = 0;
                 break;
             }
             case 3: {
                 x -= dist;
                 if (x < minLength) {
-                    dist -= maxLength;
+                    //dist -= maxLength;
                     x = minLength;
+                    dist -= Math.abs(x - connection.player.position.x);
                 } else dist = 0;
                 break;
             }
@@ -429,7 +434,7 @@ module.exports = class GameLobbby extends LobbyBase {
     { 
         let lobby = this;
         console.log('selectDir');
-            let distDice = connection.player.distDice;
+            let distDice = connection.player.dist;
             let dirDice = data.selectedDIR;
             let x = connection.player.position.x; // 당장 가야할 x
             let y = connection.player.position.y; // 당장 가야할 y
@@ -437,39 +442,43 @@ module.exports = class GameLobbby extends LobbyBase {
             let minLength=maxLength*(-1);
             let dist = connection.player.dist; // 남은 거리 이동 횟수
     
-            switch(dirDice){
+            switch (dirDice) {
                 case 0: {
-                    y+=dist;
-                    if(y>maxLength){
-                        dist -= maxLength;
+                    y += dist;
+                    if (y > maxLength) {
+                        //dist -= maxLength;
                         y = maxLength;
+                        dist -= Math.abs(y - connection.player.position.y);
                     } else dist = 0;
                     break;
                 }
                 case 1: {
-                    x+=dist;
-                    if(x>maxLength){
-                        dist -= maxLength;
+                    x += dist;
+                    if (x > maxLength) {
+                        //dist -= maxLength;
                         x = maxLength;
+                        dist -= Math.abs(x - connection.player.position.x);
                     } else dist = 0;
                     break;
                 }
                 case 2: {
-                    y-=dist; 
-                    if(y<minLength){
-                        dist -= maxLength;
+                    y -= dist;
+                    if (y < minLength) {
+                        //dist -= maxLength;
                         y = minLength;
+                        dist -= Math.abs(y - connection.player.position.y);
                     } else dist = 0;
                     break;
                 }
                 case 3: {
-                    x-=dist;
-                    if(x<minLength){
-                        dist -= maxLength;
+                    x -= dist;
+                    if (x < minLength) {
+                        //dist -= maxLength;
                         x = minLength;
+                        dist -= Math.abs(x - connection.player.position.x);
                     } else dist = 0;
                     break;
-                } 
+                }
             }
     
             let returnData = {
