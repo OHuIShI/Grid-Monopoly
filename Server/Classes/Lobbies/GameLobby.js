@@ -72,8 +72,8 @@ module.exports = class GameLobbby extends LobbyBase {
         console.log("initialSetting");
         let lobby = this;
 
-        lobby.initializeGameSetting(connection);
         lobby.addPlayer(connection);
+        lobby.initializeGameSetting(connection);
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }
