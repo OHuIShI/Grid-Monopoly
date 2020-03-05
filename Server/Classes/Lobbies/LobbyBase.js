@@ -30,9 +30,11 @@ module.exports = class LobbyBase {
 
         connection.lobby = undefined;
 
-        let index = lobby.connections.indexOf(connection);
-        if(index > -1) {
-            lobby.connections.splice(index, 1);
+        let index = connection.player.id;
+
+        // index가 문자열이라 조건문 확인 안해도 될 것 같긴 함
+        if(index) {
+            delete lobby.connections[index];
         }
     }
 }

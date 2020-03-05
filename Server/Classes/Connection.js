@@ -13,10 +13,6 @@ module.exports = class Connection {
         let server = connection.server;
         let player = connection.player;
 
-        socket.on('disconnect', function() {
-            server.onDisconnected(connection);
-        });
-
         socket.on('joinGame', function() {
             server.onAttemptToJoinGame(connection);
         });
