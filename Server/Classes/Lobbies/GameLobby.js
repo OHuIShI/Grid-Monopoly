@@ -4,6 +4,7 @@ let Connection = require('../Connection')
 let LandManager = require('../LandManager.js');
 let GameManager = require('../GameManager.js');
 let initialGameData = require('../../GameData/SampleScene.json');
+let LobbyState = require('../Utility/LobbyState');
 
 module.exports = class GameLobbby extends LobbyBase {
     constructor(id, settings = GameLobbySettings) {
@@ -11,6 +12,7 @@ module.exports = class GameLobbby extends LobbyBase {
         this.settings = settings;
         this.landManager = new LandManager();
         this.gameManager = new GameManager();
+        this.lobbyState = new LobbyState();
         this.playersID = [];
     }
 
@@ -24,7 +26,7 @@ module.exports = class GameLobbby extends LobbyBase {
     canEnterLobby(connection = Connection) {
         let lobby = this;
         let maxPlayerCount = lobby.settings.maxPlayers;
-        let currentPlayerCount = lobby.connections.length;
+        let currentPlayerCount = Object.keys(lobby.connections).length;
 
         if (currentPlayerCount + 1 > maxPlayerCount) {
             return false;
@@ -34,43 +36,87 @@ module.exports = class GameLobbby extends LobbyBase {
     }
 
     onEnterLobby(connection = Connection) {
+        let lobby = this;
         let socket = connection.socket;
         let player = connection.player;
 
         super.onEnterLobby(connection);
 
-        let returnData = {
-            id: player.id
+        // let returnData = {
+        //     id: player.id
+        // }
+        // console.log(returnData.id);
+        //console.log('# of lobby connections : '+Object.keys(lobby.connections).length);
+
+        if(Object.keys(lobby.connections).length == lobby.settings.maxPlayers){
+            console.log('We have enough players we can start the game');
+            lobby.lobbyState.currentState = lobby.lobbyState.GAME;
+            // spawn 전에 loadGame 부르고 씬 로딩되기 기다려야함
+            socket.emit('loadGame');
+            socket.broadcast.to(lobby.id).emit('loadGame');
+            // TODO : Spawn all players in   
+            lobby.onSpawnAllPlayersIntoGame(connection);
         }
-        console.log(returnData.id);
 
-        socket.emit('loadGame', returnData);
-        /*
-        // initialSetting으로 떼간 부분
-        console.log("initialSetting");
-        let lobby = this;
+        let returnLobbyData = {
+            state: lobby.lobbyState.currentState
+        }
 
-        lobby.addPlayer(connection);
-
-        // 이거 나중에 게임로비 만들면 호출하는 위치 바꿔야할듯
-        lobby.initializeGameSetting(connection);
-
-        //Handle spawning any server spawned objects here
-        //Example: loot, perhaps flying bullets etc
-        */
+        //socket.emit('loadGame', returnData);
+        //socket.emit('loadGame');
+        socket.emit('lobbyUpdate', returnLobbyData);
+        socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
     }
 
     initialSetting(connection = Connection) {
         console.log("initialSetting");
         let lobby = this;
 
-        lobby.addPlayer(connection);
-
-        // 이거 나중에 게임로비 만들면 호출하는 위치 바꿔야할듯
         lobby.initializeGameSetting(connection);
-
+        lobby.addPlayer(connection);
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
+    }
+
+    onSpawnAllPlayersIntoGame(connection = Connection) {
+        let lobby = this;
+        let connections = lobby.connections;
+        //console.log("SPAWN하라고쫌");
+        // connections.forEach(connection => {
+        //     console.log('addPlayer : '+connection.id);
+        //     lobby.addPlayer(connection);
+        // });
+        // for (let c in connections)
+        // {
+        //     console.log("HIHI");
+        //     lobby.addPlayer(connections[c]);
+        // }
+        // add all players to playersID(turn order array)
+        for (let c in connections)
+        { 
+            lobby.playersID.push(connections[c].player.id);
+        }
+        // console.log('before shuffle : ');
+        // for (let i in lobby.playersID){
+        //     console.log(lobby.playersID[i]);
+        // }
+        // shuffle turn order
+        for (let i = lobby.settings.maxPlayers - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [lobby.playersID[i], lobby.playersID[j]] = [lobby.playersID[j], lobby.playersID[i]];
+        }
+        // console.log('after:');
+        // for (let i in lobby.playersID){
+        //     console.log(lobby.playersID[i]);
+            
+        // }
+        // set all players' initial settings
+        for (let c in connections)
+        { 
+            connections[c].player.order = lobby.playersID.indexOf(connections[c].player.id);
+            connections[c].player.balance = initialGameData['initialBalance'];
+            connections[c].player.assets = initialGameData['initialBalance'];
+        }
     }
 
     onLeaveLobby(connection = Connection) {
@@ -107,25 +153,22 @@ module.exports = class GameLobbby extends LobbyBase {
         let socket = connection.socket;
         let player = connection.player;
 
-        lobby.playersID.push(player.id);
-        player.order = lobby.playersID.indexOf(player.id);
-        player.balance = initialGameData['initialBalance'];
-        player.assets = initialGameData['initialBalance'];
+        //player.order = lobby.playersID.indexOf(player.id);
+        //player.balance = initialGameData['initialBalance'];
+        //player.assets = initialGameData['initialBalance'];
 
         lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer + 1;
-
+        //console.log('My order:'+player.order);
         socket.emit('spawn', player); //tell myself I have spawned
-        socket.broadcast.to(lobby.id).emit('spawn', player); // Tell others
+        //이걸 게임로비를 만들면 주석풀고 활용해야할듯 spawn말고 게임로비에 들어왔다는 신호로
+        //socket.broadcast.to(lobby.id).emit('spawn', player); // Tell others
 
-        console.log("tell myself about everyone else");
-        console.log(connections);
+        console.log("tell myself about everyone else:" + player.id);
 
         for (let c in connections)
-        {
-            console.log("check");
-            console.log(c);
-            if (connections[c].player.id != connection.player.id) {
-                console.log("spawn emit");
+        { 
+            if (connections[c].player.id != player.id) {
+                console.log("spawn emit:"+connections[c].player.id);
                 socket.emit('spawn', connections[c].player);
             }
         }
@@ -140,16 +183,19 @@ module.exports = class GameLobbby extends LobbyBase {
             }
         });
         */
-
-        if (lobby.gameManager.CurrentPlayer == 1) {
+        //console.log("# of players:"+lobby.gameManager.CurrentPlayer);
+        if (lobby.gameManager.CurrentPlayer == lobby.settings.maxPlayers) {
             console.log('UPDATETURN');
-            connections[player.id].player.SetIsMyTurn(true);
+            connections[lobby.playersID[0]].player.SetIsMyTurn(true);
+            console.log(lobby.playersID[0]+'\'s TURN');
+            console.log(connections[lobby.playersID[0]].player.isMyTurn);
+            console.log(connections[lobby.playersID[1]].player.isMyTurn);
             lobby.gameManager.turnIndex = 0;
             let returnData = {
-                id: player.id,
+                id: lobby.playersID[0],
                 lapsToGo: lobby.gameManager.lapsToGo
             }
-            socket.emit('updateTurn', returnData);
+            connections[lobby.playersID[0]].socket.emit('updateTurn', returnData);
         }
     }
 
