@@ -12,7 +12,7 @@ module.exports = class GameLobbby extends LobbyBase {
         this.settings = settings;
         this.landManager = new LandManager();
         this.gameManager = new GameManager();
-        this.lobbyState = new LobbyState();
+        this.lobbyState = new LobbyState(settings.maxPlayers);
         this.playersID = [];
     }
 
@@ -35,6 +35,41 @@ module.exports = class GameLobbby extends LobbyBase {
         return true;
     }
 
+    onSwitchReadyState(connection = Connection, data) {
+        let lobby = this;
+        let socket = connection.socket;
+        let lobbyIndex = lobby.playersID.indexOf(connection.player.id);
+        let readyStates = lobby.lobbyState.readyStates;
+        readyStates[lobbyIndex] = data.state;
+        //console.log("onSwitchReadyState");
+        //console.log(lobby.playersID)
+        // 사실 id 줄 필요 없음, 나중에 보고 id는 빼도 됨
+        let returnData = {index: lobbyIndex, id: connection.player.id, state: data.state};
+        //console.log(returnData);
+        socket.emit('changedReadyState', returnData);
+        socket.broadcast.to(lobby.id).emit('changedReadyState', returnData);
+
+        // 게임로비의 maxPlayer인원 모두가 ready이면 게임 시작
+        if(Object.keys(lobby.connections).length == lobby.settings.maxPlayers) {
+            if(readyStates.every(val => { return val })){
+                console.log("EVERYONE READY!");
+                lobby.lobbyState.currentState = lobby.lobbyState.GAME;
+                // spawn 전에 loadGame 부르고 씬 로딩되기 기다려야함
+                socket.emit('loadGame');
+                socket.broadcast.to(lobby.id).emit('loadGame');
+                // TODO : Spawn all players in   
+                lobby.onSpawnAllPlayersIntoGame(connection);
+                
+                let returnLobbyData = {
+                    state: lobby.lobbyState.currentState
+                }
+
+                socket.emit('lobbyUpdate', returnLobbyData);
+                socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
+            }
+        }
+    }
+
     onEnterLobby(connection = Connection) {
         let lobby = this;
         let socket = connection.socket;
@@ -47,7 +82,11 @@ module.exports = class GameLobbby extends LobbyBase {
         // }
         // console.log(returnData.id);
         //console.log('# of lobby connections : '+Object.keys(lobby.connections).length);
+        
+        lobby.playersID.push(connection.player.id);
 
+        // 나중에 빨리 ready 하라고 재촉하는 코드를 여기 넣을 수 있을 듯
+        /*
         if(Object.keys(lobby.connections).length == lobby.settings.maxPlayers){
             console.log('We have enough players we can start the game');
             lobby.lobbyState.currentState = lobby.lobbyState.GAME;
@@ -57,6 +96,7 @@ module.exports = class GameLobbby extends LobbyBase {
             // TODO : Spawn all players in   
             lobby.onSpawnAllPlayersIntoGame(connection);
         }
+        */
 
         let returnLobbyData = {
             state: lobby.lobbyState.currentState
@@ -64,6 +104,8 @@ module.exports = class GameLobbby extends LobbyBase {
 
         //socket.emit('loadGame', returnData);
         //socket.emit('loadGame');
+        
+        //LobbyState.js에 기록한대로 나중에 GameLobby State를 따로 만들면 좋을 듯
         socket.emit('lobbyUpdate', returnLobbyData);
         socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
     }
@@ -91,11 +133,12 @@ module.exports = class GameLobbby extends LobbyBase {
         //     console.log("HIHI");
         //     lobby.addPlayer(connections[c]);
         // }
+        
         // add all players to playersID(turn order array)
-        for (let c in connections)
-        { 
-            lobby.playersID.push(connections[c].player.id);
-        }
+        // for (let c in connections)
+        // { 
+        //     lobby.playersID.push(connections[c].player.id);
+        // }
         // console.log('before shuffle : ');
         // for (let i in lobby.playersID){
         //     console.log(lobby.playersID[i]);
@@ -136,6 +179,7 @@ module.exports = class GameLobbby extends LobbyBase {
         lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer - 1;
         let index = lobby.playersID.indexOf(connection.player.id);
         lobby.playersID.splice(index, 1);
+        console.log(lobby.playersID);
 
         connection.socket.broadcast.to(lobby.id).emit('disconnected', {
             id: connection.player.id
