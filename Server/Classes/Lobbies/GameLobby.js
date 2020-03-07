@@ -358,15 +358,12 @@ module.exports = class GameLobbby extends LobbyBase {
                 connection.socket.broadcast.to(lobby.id).emit('gameOver', returnData);
             } else {
                 let nextTurnIndex = gameManager.updateTurnIndex();
-                console.log('nextTurnIndex: ' + nextTurnIndex);
-                console.log('nextTurnPlayerId: ' + playersID[nextTurnIndex]);
                 let nextTurnID = connections[playersID[nextTurnIndex]].player.id;
 
                 let returnData = {
                     id: nextTurnID,
                     lapsToGo: gameManager.lapsToGo
                 }
-                console.log(returnData);
                 connection.socket.emit('updateTurn', returnData);
                 connection.socket.broadcast.to(lobby.id).emit('updateTurn', returnData);
             }
