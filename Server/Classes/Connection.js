@@ -21,6 +21,10 @@ module.exports = class Connection {
             connection.lobby.initialSetting(connection);
         });
 
+        socket.on('onSwitchReadyState', function (data) {
+            connection.lobby.onSwitchReadyState(connection, data);
+        });
+
         //gameLobby
         socket.on('GoBankrupt', function (data) {
             connection.lobby.GoBankrupt(connection, data);
@@ -36,7 +40,7 @@ module.exports = class Connection {
             connection.lobby.rollDices(connection);
         });
 
-    //gameLobby
+        //gameLobby
         socket.on('selectDirection', function(data){
             connection.lobby.selectDirection(connection, data);
         });

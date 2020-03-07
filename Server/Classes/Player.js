@@ -3,7 +3,7 @@ var Vector2 = require('./Vector2.js');
 
 module.exports = class Player {
     constructor() {
-        this.username = '';
+        this.username = 'YHPARK';
         this.id = shortID.generate();
         this.lobby = 0;
         this.order = -1;
