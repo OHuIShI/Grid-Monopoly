@@ -269,7 +269,7 @@ module.exports = class GameLobbby extends LobbyBase {
             case "Sell":
                 console.log("Sell");
                 prevOwnerID = landManager.landData[landIndex].ownerID;
-                connections[prevOwnerID].assets -= landManager.landData[landIndex].totalValue;
+                connections[prevOwnerID].player.assets -= landManager.landData[landIndex].totalValue;
 
                 landManager.landData[landIndex].ownerID = id;
                 for (let key in landManager.landData[landIndex].status)
@@ -278,7 +278,7 @@ module.exports = class GameLobbby extends LobbyBase {
                 }
                 landManager.landData[landIndex].calculateTotalValue();
                 data['prevOwnerId'] = prevOwnerID;
-                data['prevOwnerAssets'] = connections[prevOwnerID].assets;
+                data['prevOwnerAssets'] = connections[prevOwnerID].player.assets;
                 break;
         }
         data['totalValue'] = landManager.landData[landIndex].totalValue;
