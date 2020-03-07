@@ -76,14 +76,17 @@ module.exports = class GameLobbby extends LobbyBase {
         let player = connection.player;
 
         super.onEnterLobby(connection);
+        lobby.playersID.push(connection.player.id);
 
-        // let returnData = {
-        //     id: player.id
-        // }
+        let returnLobbyData = {
+            state: lobby.lobbyState.currentState
+        }
+
+        socket.emit('lobbyUpdate', returnLobbyData);
+        socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
+
         // console.log(returnData.id);
         //console.log('# of lobby connections : '+Object.keys(lobby.connections).length);
-        
-        lobby.playersID.push(connection.player.id);
 
         // 나중에 빨리 ready 하라고 재촉하는 코드를 여기 넣을 수 있을 듯
         /*
@@ -97,17 +100,25 @@ module.exports = class GameLobbby extends LobbyBase {
             lobby.onSpawnAllPlayersIntoGame(connection);
         }
         */
-
-        let returnLobbyData = {
-            state: lobby.lobbyState.currentState
+        let lobbyIndex = lobby.playersID.indexOf(connection.player.id);
+        let returnData = {
+            index: lobbyIndex,
+            id: player.id,
+            name: player.username,
         }
-
-        //socket.emit('loadGame', returnData);
-        //socket.emit('loadGame');
-        
         //LobbyState.js에 기록한대로 나중에 GameLobby State를 따로 만들면 좋을 듯
-        socket.emit('lobbyUpdate', returnLobbyData);
-        socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
+        //socket.emit('OnEnterGameLobby', returnData);
+        socket.broadcast.to(lobby.id).emit('OnEnterGameLobby', returnData);
+        
+        for (let i in lobby.playersID){
+            console.log(lobby.playersID[i]);
+            let returnData = {
+                index: i,
+                id: lobby.playersID[i],
+                name: lobby.connections[lobby.playersID[i]].player.username,
+            }
+            socket.emit('OnEnterGameLobby', returnData);
+        }
     }
 
     initialSetting(connection = Connection) {
