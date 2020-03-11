@@ -9,7 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "crypto-js": "^4.0.0",
     "shortid": "^2.2.15",
     "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
   }
 }

@@ -5,6 +5,8 @@ let LandManager = require('../LandManager.js');
 let GameManager = require('../GameManager.js');
 let initialGameData = require('../../GameData/SampleScene.json');
 let LobbyState = require('../Utility/LobbyState');
+let BlockManager = require('../../Blockchain/BlockManager.js');
+var shortID = require('shortid');
 
 module.exports = class GameLobbby extends LobbyBase {
     constructor(id, settings = GameLobbySettings) {
@@ -14,6 +16,8 @@ module.exports = class GameLobbby extends LobbyBase {
         this.gameManager = new GameManager();
         this.lobbyState = new LobbyState(settings.maxPlayers);
         this.playersID = [];
+        this.gameLobbyID = shortID.generate();
+        this.blockManager = new BlockManager();
     }
 
     onUpdate() {
@@ -66,6 +70,8 @@ module.exports = class GameLobbby extends LobbyBase {
 
                 socket.emit('lobbyUpdate', returnLobbyData);
                 socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
+
+                lobby.blockManager.createGenesis();
             }
         }
     }
