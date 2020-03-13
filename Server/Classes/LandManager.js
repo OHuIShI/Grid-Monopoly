@@ -21,6 +21,6 @@ module.exports = class LandManager {
     }
 
     InitializeLandData() {
-
+        // 정체를 알 수 없는 함수
     }
 }

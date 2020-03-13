@@ -37,9 +37,9 @@ class Block {
 let blockchains: { [id: string]: Block[] } = {};
 //let blockchain: Block[] = [genesisBlock];
 
-const createGenesisBlock = (gameLobbyID : string): Block => {
+const createGenesisBlock = (gameLobbyID : string, blockData : object): Block => {
     
-    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(),{eventData:'genesis block'},0);
+    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(),blockData, 0);
 
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain: Block[] = [genesisBlock];

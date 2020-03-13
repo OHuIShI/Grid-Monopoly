@@ -70,8 +70,11 @@ module.exports = class GameLobbby extends LobbyBase {
 
                 socket.emit('lobbyUpdate', returnLobbyData);
                 socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
-
-                lobby.blockManager.createGenesis();
+                let blockData = {
+                    players: lobby.playersID,
+                    initialGameData : initialGameData
+                }
+                lobby.blockManager.createGenesis(blockData);
             }
         }
     }
@@ -131,8 +134,12 @@ module.exports = class GameLobbby extends LobbyBase {
         console.log("initialSetting");
         let lobby = this;
 
+        // 호출 순서 중요
         lobby.addPlayer(connection);
         lobby.initializeGameSetting(connection);
+
+        
+
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }
@@ -212,10 +219,6 @@ module.exports = class GameLobbby extends LobbyBase {
         let connections = lobby.connections;
         let socket = connection.socket;
         let player = connection.player;
-
-        //player.order = lobby.playersID.indexOf(player.id);
-        //player.balance = initialGameData['initialBalance'];
-        //player.assets = initialGameData['initialBalance'];
 
         lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer + 1;
         //console.log('My order:'+player.order);
