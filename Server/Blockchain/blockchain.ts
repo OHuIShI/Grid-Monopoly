@@ -5,6 +5,12 @@ import * as CryptoJS from 'crypto-js';
 import {hexToBinary} from './util';
 //let hexToBinary = require('./util');
 // Block 의 class 를 설정한다. 
+
+//임시 채팅창
+/*
+바꿀 필요가 있나? data 안에 다 쳐넣으면 안돼? 어차피 데이터를 까는거니께..
+ㅈㅁ
+*/
 class Block {
 
     // 블록 구조의 필수적인 요소들에 대한 구현이다. 
@@ -17,7 +23,7 @@ class Block {
     public difficulty: number;
     public nonce: number;
     constructor(index: number, hash: string, previousHash: string,
-                timestamp: number, data: string, difficulty: number, nonce: number) {
+                timestamp: number, data: object, difficulty: number, nonce: number) {
         this.index = index;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
@@ -33,7 +39,7 @@ let blockchains: { [id: string]: Block[] } = {};
 
 const createGenesisBlock = (gameLobbyID : string): Block => {
     
-    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(),'genesis block',0);
+    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(),{eventData:'genesis block'},0);
 
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain: Block[] = [genesisBlock];
@@ -42,10 +48,12 @@ const createGenesisBlock = (gameLobbyID : string): Block => {
 };
 
 // genesisBlock 하드코딩 되어있다.
+/*
 const genesisBlock: Block = new Block(
     // 위의 블록구조 처럼 index, hash, previousHash, timestamp, data, difficulty, nonce 순으로 정보가 기입되어있음을 알 수 있다. 
     0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, 'my genesis block!!', 0, 0
 );
+*/
 
 const getBlockchain = (gameLobbyID: string): Block[] => blockchains[gameLobbyID];
 // 마지막 블록의 정보를 가지고 오는 과정이다. 현 체인의 길이에서 - 1 을 한 index 를 가지고 있는 블록의 정보를 가지고 온다.
@@ -81,7 +89,7 @@ const getAdjustedDifficulty = (latestBlock: Block, aBlockchain: Block[]) => {
 
 const getCurrentTimestamp = (): number => Math.round(new Date().getTime() / 1000);
 // 블록을 생성하는 과정이다. 
-const generateNextBlock = (blockData: string, gameLobbyID : string) => {
+const generateNextBlock = (blockData: object, gameLobbyID : string) => {
     const previousBlock: Block = getLatestBlock(gameLobbyID);              // 새로운 블록을 만들 때 그 전 블록으로 현 체인의 마지막 블록을 설정한다. 
     const difficulty: number = getDifficulty(getBlockchain(gameLobbyID));
     console.log('difficulty: ' + difficulty);
@@ -93,7 +101,7 @@ const generateNextBlock = (blockData: string, gameLobbyID : string) => {
     return newBlock;
 };
 // 블록을 생성하는 과정이다. 
-const findBlock = (index: number, previousHash: string, timestamp: number, data: string, difficulty: number): Block => {
+const findBlock = (index: number, previousHash: string, timestamp: number, data: object, difficulty: number): Block => {
     let nonce = 0;
     while (true) {
         const hash: string = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
@@ -182,6 +190,7 @@ const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
     return hashInBinary.startsWith(requiredPrefix);
 };
 // 체인의 유효성을 판단하는 과정이다.
+/*
 const isValidChain = (blockchainToValidate: Block[]): boolean => {
     // 체인의 첫 번째 블록이 genesisBlock 과 일치하는지 확인한다. 
     const isValidGenesis = (block: Block): boolean => {
@@ -198,7 +207,7 @@ const isValidChain = (blockchainToValidate: Block[]): boolean => {
     }
     return true;
 };
-
+*/
 const addBlockToChain = (newBlock: Block, gameLobbyID : string) => {
     if (isValidNewBlock(newBlock, getLatestBlock(gameLobbyID))) {
         blockchains[gameLobbyID].push(newBlock);
@@ -207,6 +216,7 @@ const addBlockToChain = (newBlock: Block, gameLobbyID : string) => {
     return false;
 };
 // 가장 긴 체인이 유효한 체인으로 교체되는 과정이다.
+/*
 const replaceChain = (newBlocks: Block[], gameLobbyID : string) => {
     // 새로운 chain 이 유효한 chain 이고 그 chain 이 기존의 것보다 더 길면 교체된다.
     if (isValidChain(newBlocks) &&
@@ -220,5 +230,6 @@ const replaceChain = (newBlocks: Block[], gameLobbyID : string) => {
         console.log('Received blockchain invalid');
     }
 };
+*/
 
-export {Block, getBlockchain, getLatestBlock, generateNextBlock, isValidBlockStructure, replaceChain, addBlockToChain, createGenesisBlock};
+export {Block, getBlockchain, getLatestBlock, generateNextBlock, isValidBlockStructure, addBlockToChain, createGenesisBlock};

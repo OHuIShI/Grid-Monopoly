@@ -14,6 +14,11 @@ const CryptoJS = __importStar(require("crypto-js"));
 const util_1 = require("./util");
 //let hexToBinary = require('./util');
 // Block 의 class 를 설정한다. 
+//임시 채팅창
+/*
+바꿀 필요가 있나? data 안에 다 쳐넣으면 안돼? 어차피 데이터를 까는거니께..
+ㅈㅁ
+*/
 class Block {
     constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) {
         this.index = index;
@@ -30,7 +35,7 @@ exports.Block = Block;
 let blockchains = {};
 //let blockchain: Block[] = [genesisBlock];
 const createGenesisBlock = (gameLobbyID) => {
-    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(), 'genesis block', 0);
+    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(), { eventData: 'genesis block' }, 0);
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain = [genesisBlock];
     blockchains[gameLobbyID] = blockchain;
@@ -38,9 +43,12 @@ const createGenesisBlock = (gameLobbyID) => {
 };
 exports.createGenesisBlock = createGenesisBlock;
 // genesisBlock 하드코딩 되어있다.
-const genesisBlock = new Block(
-// 위의 블록구조 처럼 index, hash, previousHash, timestamp, data, difficulty, nonce 순으로 정보가 기입되어있음을 알 수 있다. 
-0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, 'my genesis block!!', 0, 0);
+/*
+const genesisBlock: Block = new Block(
+    // 위의 블록구조 처럼 index, hash, previousHash, timestamp, data, difficulty, nonce 순으로 정보가 기입되어있음을 알 수 있다.
+    0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, 'my genesis block!!', 0, 0
+);
+*/
 const getBlockchain = (gameLobbyID) => blockchains[gameLobbyID];
 exports.getBlockchain = getBlockchain;
 // 마지막 블록의 정보를 가지고 오는 과정이다. 현 체인의 길이에서 - 1 을 한 index 를 가지고 있는 블록의 정보를 가지고 온다.
@@ -178,15 +186,16 @@ const hashMatchesDifficulty = (hash, difficulty) => {
     return hashInBinary.startsWith(requiredPrefix);
 };
 // 체인의 유효성을 판단하는 과정이다.
-const isValidChain = (blockchainToValidate) => {
-    // 체인의 첫 번째 블록이 genesisBlock 과 일치하는지 확인한다. 
-    const isValidGenesis = (block) => {
+/*
+const isValidChain = (blockchainToValidate: Block[]): boolean => {
+    // 체인의 첫 번째 블록이 genesisBlock 과 일치하는지 확인한다.
+    const isValidGenesis = (block: Block): boolean => {
         return JSON.stringify(block) === JSON.stringify(genesisBlock);
     };
     if (!isValidGenesis(blockchainToValidate[0])) {
         return false;
     }
-    // isValidNewBlock 을 통하여 전체 체인을 검증한다. 
+    // isValidNewBlock 을 통하여 전체 체인을 검증한다.
     for (let i = 1; i < blockchainToValidate.length; i++) {
         if (!isValidNewBlock(blockchainToValidate[i], blockchainToValidate[i - 1])) {
             return false;
@@ -194,6 +203,7 @@ const isValidChain = (blockchainToValidate) => {
     }
     return true;
 };
+*/
 const addBlockToChain = (newBlock, gameLobbyID) => {
     if (isValidNewBlock(newBlock, getLatestBlock(gameLobbyID))) {
         blockchains[gameLobbyID].push(newBlock);
@@ -202,18 +212,3 @@ const addBlockToChain = (newBlock, gameLobbyID) => {
     return false;
 };
 exports.addBlockToChain = addBlockToChain;
-// 가장 긴 체인이 유효한 체인으로 교체되는 과정이다.
-const replaceChain = (newBlocks, gameLobbyID) => {
-    // 새로운 chain 이 유효한 chain 이고 그 chain 이 기존의 것보다 더 길면 교체된다.
-    if (isValidChain(newBlocks) &&
-        getAccumulatedDifficulty(newBlocks) > getAccumulatedDifficulty(getBlockchain(gameLobbyID))) {
-        console.log('Received blockchain is valid. Replacing current blockchain with received blockchain');
-        blockchains[gameLobbyID] = newBlocks;
-        //broadcastLatest();
-    }
-    // 위의 2가지 조건 중 1개라도 만족하지 못하면 교체되지 않는다.
-    else {
-        console.log('Received blockchain invalid');
-    }
-};
-exports.replaceChain = replaceChain;

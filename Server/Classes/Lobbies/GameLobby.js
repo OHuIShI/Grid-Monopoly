@@ -168,7 +168,6 @@ module.exports = class GameLobbby extends LobbyBase {
         // console.log('after:');
         // for (let i in lobby.playersID){
         //     console.log(lobby.playersID[i]);
-            
         // }
         // set all players' initial settings
         for (let c in connections)
