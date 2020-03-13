@@ -27,5 +27,4 @@ module.exports = class BlockManager {
 
         return newBlock;
     }
-    
 }                   
