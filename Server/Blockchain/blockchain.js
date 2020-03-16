@@ -14,11 +14,6 @@ const CryptoJS = __importStar(require("crypto-js"));
 const util_1 = require("./util");
 //let hexToBinary = require('./util');
 // Block 의 class 를 설정한다. 
-//임시 채팅창
-/*
-바꿀 필요가 있나? data 안에 다 쳐넣으면 안돼? 어차피 데이터를 까는거니께..
-ㅈㅁ
-*/
 class Block {
     constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) {
         this.index = index;
@@ -72,7 +67,7 @@ const getDifficulty = (aBlockchain) => {
 const getAdjustedDifficulty = (latestBlock, aBlockchain) => {
     const prevAdjustmentBlock = aBlockchain[aBlockchain.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
     const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
-    const timeTaken = latestBlock.timestamp - prevAdjustmentBlock.timestamp;
+    const timeTaken = Number(latestBlock.timestamp) - Number(prevAdjustmentBlock.timestamp);
     if (timeTaken < timeExpected / 2) {
         return prevAdjustmentBlock.difficulty + 1;
     }
@@ -83,7 +78,7 @@ const getAdjustedDifficulty = (latestBlock, aBlockchain) => {
         return prevAdjustmentBlock.difficulty;
     }
 };
-const getCurrentTimestamp = () => Math.round(new Date().getTime() / 1000);
+const getCurrentTimestamp = () => Math.round(new Date().getTime() / 1000).toString();
 // 블록을 생성하는 과정이다. 
 const generateNextBlock = (blockData, gameLobbyID) => {
     const previousBlock = getLatestBlock(gameLobbyID); // 새로운 블록을 만들 때 그 전 블록으로 현 체인의 마지막 블록을 설정한다. 
@@ -160,8 +155,8 @@ const getAccumulatedDifficulty = (aBlockchain) => {
 };
 // 새롭게 추가되었다. 
 const isValidTimestamp = (newBlock, previousBlock) => {
-    return (previousBlock.timestamp - 60 < newBlock.timestamp)
-        && newBlock.timestamp - 60 < getCurrentTimestamp();
+    return (Number(previousBlock.timestamp) - 60 < Number(newBlock.timestamp))
+        && Number(newBlock.timestamp) - 60 < Number(getCurrentTimestamp());
 };
 // 새롭게 추가되었다. 
 const hasValidHash = (block) => {

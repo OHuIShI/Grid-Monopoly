@@ -138,8 +138,9 @@ module.exports = class GameLobbby extends LobbyBase {
         lobby.addPlayer(connection);
         lobby.initializeGameSetting(connection);
 
+        // 제네시스 블록 넘기기
+        connection.socket.emit('setBlockChain',this.blockManager.getLatestBlock());
         
-
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }

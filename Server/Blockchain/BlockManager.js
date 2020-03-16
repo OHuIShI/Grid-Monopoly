@@ -1,5 +1,5 @@
 //let Blockchain = require('./blockchain.js');
-import { createGenesisBlock, generateNextBlock } from './blockchain.js';
+import { createGenesisBlock, generateNextBlock, getLatestBlock } from './blockchain.js';
 let Connection = require('../Classes/Connection.js');
 module.exports = class BlockManager {
     constructor(connections = Connection, gameLobbyID) {
@@ -27,4 +27,8 @@ module.exports = class BlockManager {
 
         return newBlock;
     }
+    getLatestBlock(){
+        return getLatestBlock(this.gameLobbyID);
+    }
+    
 }                   

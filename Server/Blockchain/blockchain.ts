@@ -6,24 +6,19 @@ import {hexToBinary} from './util';
 //let hexToBinary = require('./util');
 // Block 의 class 를 설정한다. 
 
-//임시 채팅창
-/*
-바꿀 필요가 있나? data 안에 다 쳐넣으면 안돼? 어차피 데이터를 까는거니께..
-ㅈㅁ
-*/
 class Block {
 
     // 블록 구조의 필수적인 요소들에 대한 구현이다. 
     public index: number;
     public hash: string;
     public previousHash: string;
-    public timestamp: number;
+    public timestamp: string;
     public data: Object;
     // 새롭게 추가되었다. 새롭게 block 의 요소로 추가되었다. 
     public difficulty: number;
     public nonce: number;
     constructor(index: number, hash: string, previousHash: string,
-                timestamp: number, data: object, difficulty: number, nonce: number) {
+                timestamp: string, data: object, difficulty: number, nonce: number) {
         this.index = index;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
@@ -77,7 +72,7 @@ const getDifficulty = (aBlockchain: Block[]): number => {
 const getAdjustedDifficulty = (latestBlock: Block, aBlockchain: Block[]) => {
     const prevAdjustmentBlock: Block = aBlockchain[aBlockchain.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
     const timeExpected: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
-    const timeTaken: number = latestBlock.timestamp - prevAdjustmentBlock.timestamp;
+    const timeTaken: number = Number(latestBlock.timestamp) - Number(prevAdjustmentBlock.timestamp);
     if (timeTaken < timeExpected / 2) {
         return prevAdjustmentBlock.difficulty + 1;
     } else if (timeTaken > timeExpected * 2) {
@@ -87,21 +82,21 @@ const getAdjustedDifficulty = (latestBlock: Block, aBlockchain: Block[]) => {
     }
 };
 
-const getCurrentTimestamp = (): number => Math.round(new Date().getTime() / 1000);
+const getCurrentTimestamp = (): string => Math.round(new Date().getTime() / 1000).toString();
 // 블록을 생성하는 과정이다. 
 const generateNextBlock = (blockData: object, gameLobbyID : string) => {
     const previousBlock: Block = getLatestBlock(gameLobbyID);              // 새로운 블록을 만들 때 그 전 블록으로 현 체인의 마지막 블록을 설정한다. 
     const difficulty: number = getDifficulty(getBlockchain(gameLobbyID));
     console.log('difficulty: ' + difficulty);
     const nextIndex: number = previousBlock.index + 1;          // index 를 설정하는 과정이다.
-    const nextTimestamp: number = getCurrentTimestamp();        // #1 에서 약간 더 발전했다. 
+    const nextTimestamp: string = getCurrentTimestamp();        // #1 에서 약간 더 발전했다. 
     const newBlock: Block = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, difficulty);
     addBlock(newBlock, gameLobbyID);
     //broadcastLatest();      // import 한 {broadcastLatest}이 사용되었다.
     return newBlock;
 };
 // 블록을 생성하는 과정이다. 
-const findBlock = (index: number, previousHash: string, timestamp: number, data: object, difficulty: number): Block => {
+const findBlock = (index: number, previousHash: string, timestamp: string, data: object, difficulty: number): Block => {
     let nonce = 0;
     while (true) {
         const hash: string = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
@@ -115,7 +110,7 @@ const findBlock = (index: number, previousHash: string, timestamp: number, data:
 const calculateHashForBlock = (block: Block): string =>
     calculateHash(block.index, block.previousHash, block.timestamp, block.data, block.difficulty, block.nonce);
 // class Block 의 요소들로 hash 값을 계산하는 과정이다. 
-const calculateHash = (index: number, previousHash: string, timestamp: number, data: Object, difficulty: number, nonce: number): string =>
+const calculateHash = (index: number, previousHash: string, timestamp: string, data: Object, difficulty: number, nonce: number): string =>
     CryptoJS.SHA256(index + previousHash + timestamp + data + difficulty + nonce).toString();
 // 새로운 블록을 더하는 과정이다.
 const addBlock = (newBlock: Block, gameLobbyID : string) => {
@@ -162,8 +157,8 @@ const getAccumulatedDifficulty = (aBlockchain: Block[]): number => {
 };
 // 새롭게 추가되었다. 
 const isValidTimestamp = (newBlock: Block, previousBlock: Block): boolean => {
-    return ( previousBlock.timestamp - 60 < newBlock.timestamp )
-        && newBlock.timestamp - 60 < getCurrentTimestamp();
+    return ( Number(previousBlock.timestamp) - 60 < Number(newBlock.timestamp) )
+        && Number(newBlock.timestamp) - 60 < Number(getCurrentTimestamp());
 };
 // 새롭게 추가되었다. 
 const hasValidHash = (block: Block): boolean => {
