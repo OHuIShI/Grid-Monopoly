@@ -49,7 +49,7 @@ module.exports = class GameLobbby extends LobbyBase {
         //console.log(lobby.playersID)
         // 사실 id 줄 필요 없음, 나중에 보고 id는 빼도 됨
         let returnData = {index: lobbyIndex, id: connection.player.id, state: data.state};
-        //console.log(returnData);
+        console.log(returnData);
         socket.emit('changedReadyState', returnData);
         socket.broadcast.to(lobby.id).emit('changedReadyState', returnData);
 
@@ -58,7 +58,7 @@ module.exports = class GameLobbby extends LobbyBase {
             if(readyStates.every(val => { return val })){
                 console.log("EVERYONE READY!");
                 lobby.lobbyState.currentState = lobby.lobbyState.GAME;
-                // spawn 전에 loadGame 부르고 씬 로딩되기 기다려야함
+                // spawn 전에 loadGame 부르고 씬 로딩되기 기다려야 함
                 socket.emit('loadGame');
                 socket.broadcast.to(lobby.id).emit('loadGame');
                 // TODO : Spawn all players in   
@@ -75,6 +75,8 @@ module.exports = class GameLobbby extends LobbyBase {
                     initialGameData : initialGameData
                 }
                 lobby.blockManager.createGenesis(blockData);
+                socket.emit('setBlockChain',this.blockManager.getLatestBlock()); 
+                socket.broadcast.to(lobby.id).emit('setBlockChain',this.blockManager.getLatestBlock());
             }
         }
     }
@@ -137,10 +139,6 @@ module.exports = class GameLobbby extends LobbyBase {
         // 호출 순서 중요
         lobby.addPlayer(connection);
         lobby.initializeGameSetting(connection);
-
-        // 제네시스 블록 넘기기
-        connection.socket.emit('setBlockChain',this.blockManager.getLatestBlock());
-        
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }
@@ -192,7 +190,7 @@ module.exports = class GameLobbby extends LobbyBase {
         super.onLeaveLobby(connection);
 
         lobby.removePlayer(connection);
-
+        
         //Handle unspawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }
@@ -212,7 +210,7 @@ module.exports = class GameLobbby extends LobbyBase {
 
     initializeGameSetting(connection = Connection) {
         let lobby = this;
-        connection.socket.emit('initializeGameSetting', { items: lobby.landManager.landData });
+        connection.socket.emit('initializeGameSetting');
     }
 
     addPlayer(connection = Connection) {
@@ -259,7 +257,9 @@ module.exports = class GameLobbby extends LobbyBase {
                 id: lobby.playersID[0],
                 lapsToGo: lobby.gameManager.lapsToGo
             }
-            connections[lobby.playersID[0]].socket.emit('updateTurn', returnData);
+            lobby.blockManager.createNewBlock('updateTurn', returnData);
+            connections[lobby.playersID[0]].socket.emit('updateTurn',this.blockManager.getLatestBlock());
+            connections[lobby.playersID[0]].socket.broadcast.to(lobby.id).emit('updateTurn',this.blockManager.getLatestBlock());
         }
     }
 
@@ -281,9 +281,10 @@ module.exports = class GameLobbby extends LobbyBase {
             connections[receiverID].player.assets += cost;
             data['receiverAssets'] = connections[receiverID].player.assets;
         }
-
-        connection.socket.emit('updateBalance', data);
-        connection.socket.broadcast.to(lobby.id).emit('updateBalance', data);
+        lobby.blockManager.createNewBlock('updateBalance', data);
+        
+        connection.socket.emit('updateBalance',this.blockManager.getLatestBlock());
+        connection.socket.broadcast.to(lobby.id).emit('updateBalance',this.blockManager.getLatestBlock());
     }
 
     updateLandData(connection = Connection, data){
@@ -346,8 +347,9 @@ module.exports = class GameLobbby extends LobbyBase {
                 break;
         }
         data['totalValue'] = landManager.landData[landIndex].totalValue;
-        connection.socket.emit('updateLandData', data);
-        connection.socket.broadcast.to(lobby.id).emit('updateLandData', data);
+        lobby.blockManager.createNewBlock('updateLandData', data);
+        connection.socket.emit('updateLandData',this.blockManager.getLatestBlock());
+        connection.socket.broadcast.to(lobby.id).emit('updateLandData',this.blockManager.getLatestBlock());
     }
 
     turnOver(connection = Connection) {
@@ -363,8 +365,9 @@ module.exports = class GameLobbby extends LobbyBase {
                 let returnData = {
                     winner: connections[playersID[0]].player.id
                 }
-                connection.socket.emit('gameOver', returnData);
-                connection.socket.broadcast.to(lobby.id).emit('gameOver', returnData);
+                lobby.blockManager.createNewBlock('gameOver', returnData);
+                connection.socket.emit('gameOver',this.blockManager.getLatestBlock());
+                connection.socket.broadcast.to(lobby.id).emit('gameOver',this.blockManager.getLatestBlock());
             } else {
                 let nextTurnIndex = gameManager.updateTurnIndex();
                 let nextTurnID = connections[playersID[nextTurnIndex]].player.id;
@@ -373,8 +376,9 @@ module.exports = class GameLobbby extends LobbyBase {
                     id: nextTurnID,
                     lapsToGo: gameManager.lapsToGo
                 }
-                connection.socket.emit('updateTurn', returnData);
-                connection.socket.broadcast.to(lobby.id).emit('updateTurn', returnData);
+                lobby.blockManager.createNewBlock('gameOver', returnData);
+                connection.socket.emit('updateTurn',this.blockManager.getLatestBlock());
+                connection.socket.broadcast.to(lobby.id).emit('updateTurn',this.blockManager.getLatestBlock());
             }
         } else {
             let winnerIndex = 0;
@@ -387,8 +391,9 @@ module.exports = class GameLobbby extends LobbyBase {
             let returnData = {
                 winner: connections[playersID[winnerIndex]].player.id
             }
-            connection.socket.emit('gameOver', returnData);
-            connection.socket.broadcast.to(lobby.id).emit('gameOver', returnData);
+            lobby.blockManager.createNewBlock('gameOver', returnData);
+            connection.socket.emit('gameOver',this.blockManager.getLatestBlock());
+            connection.socket.broadcast.to(lobby.id).emit('gameOver',this.blockManager.getLatestBlock());
         }
     }
 
@@ -459,8 +464,10 @@ module.exports = class GameLobbby extends LobbyBase {
 
         connection.player.updatePosition(returnData);
         connection.player.showPlayerData();
-        connection.socket.emit('updatePosition', returnData);
-        connection.socket.broadcast.to(lobby.id).emit('updatePosition', returnData);
+        lobby.blockManager.createNewBlock('updatePosition', returnData);
+        
+        connection.socket.emit('updatePosition',this.blockManager.getLatestBlock());
+        connection.socket.broadcast.to(lobby.id).emit('updatePosition',this.blockManager.getLatestBlock());
     }   
     
     GoBankrupt(connection = Connection,data)
@@ -487,8 +494,9 @@ module.exports = class GameLobbby extends LobbyBase {
     
             lobby.gameManager.afterBankrupt = true;
             
-            connection.socket.emit('GoBankrupt', data);
-            connection.socket.broadcast.to(lobby.id).emit('GoBankrupt', data);
+            lobby.blockManager.createNewBlock('GoBankrupt', data);
+            connection.socket.emit('GoBankrupt',this.blockManager.getLatestBlock());
+            connection.socket.broadcast.to(lobby.id).emit('GoBankrupt',this.blockManager.getLatestBlock());
     }
 
     selectDirection(connection = Connection, data)
@@ -553,7 +561,9 @@ module.exports = class GameLobbby extends LobbyBase {
             
             connection.player.updatePosition(returnData);
             connection.player.showPlayerData();
-            connection.socket.emit('updatePosition', returnData);
-            connection.socket.broadcast.to(lobby.id).emit('updatePosition', returnData);
+        
+            lobby.blockManager.createNewBlock('updatePosition', returnData);
+            connection.socket.emit('updatePosition',this.blockManager.getLatestBlock());
+            connection.socket.broadcast.to(lobby.id).emit('updatePosition',this.blockManager.getLatestBlock());
     }
 }

@@ -119,7 +119,7 @@ const isValidBlockStructure = (block) => {
     return typeof block.index === 'number'
         && typeof block.hash === 'string'
         && typeof block.previousHash === 'string'
-        && typeof block.timestamp === 'number'
+        && typeof block.timestamp === 'string'
         && typeof block.data === 'object';
 };
 exports.isValidBlockStructure = isValidBlockStructure;

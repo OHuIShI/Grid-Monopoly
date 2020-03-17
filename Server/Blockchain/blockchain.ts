@@ -125,7 +125,7 @@ const isValidBlockStructure = (block: Block): boolean => {
     return typeof block.index === 'number'
         && typeof block.hash === 'string'
         && typeof block.previousHash === 'string'
-        && typeof block.timestamp === 'number'
+        && typeof block.timestamp === 'string'
         && typeof block.data === 'object';
 };
 // 새로운 블록의 유효성을 판단하는 과정이다. 
