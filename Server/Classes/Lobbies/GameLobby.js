@@ -139,7 +139,6 @@ module.exports = class GameLobbby extends LobbyBase {
         // 호출 순서 중요
         lobby.initializeGameSetting(connection);
         lobby.addPlayer(connection);
-        
         //Handle spawning any server spawned objects here
         //Example: loot, perhaps flying bullets etc
     }
