@@ -89,6 +89,7 @@ module.exports = class GameLobbby extends LobbyBase {
         super.onEnterLobby(connection);
         lobby.playersID.push(connection.player.id);
 
+        lobby.lobbyState.currentState = lobby.lobbyState.GAMELOBBY;
         let returnLobbyData = {
             state: lobby.lobbyState.currentState
         }
@@ -390,9 +391,17 @@ module.exports = class GameLobbby extends LobbyBase {
                     winner: ranking[0],
                     ranking: ranking
                 }
+                lobby.lobbyState.currentState = lobby.lobbyState.ENDGAME;
+                let returnLobbyData = {
+                    state: lobby.lobbyState.currentState
+                }
+
                 lobby.blockManager.createNewBlock('gameOver', returnData);
                 connection.socket.emit('gameOver',this.blockManager.getLatestBlock());
                 connection.socket.broadcast.to(lobby.id).emit('gameOver',this.blockManager.getLatestBlock());
+                
+                connection.socket.emit('lobbyUpdate', returnLobbyData);
+                connection.socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
             } else {
                 let nextTurnIndex = gameManager.updateTurnIndex();
                 let nextTurnID = connections[playersID[nextTurnIndex]].player.id;
@@ -434,10 +443,18 @@ module.exports = class GameLobbby extends LobbyBase {
                 winner: ranking[0],
                 ranking: ranking
             }
+            lobby.lobbyState.currentState = lobby.lobbyState.ENDGAME;
+            let returnLobbyData = {
+                state: lobby.lobbyState.currentState
+            }
+
             console.log(returnData);
             lobby.blockManager.createNewBlock('gameOver', returnData);
             connection.socket.emit('gameOver',this.blockManager.getLatestBlock());
             connection.socket.broadcast.to(lobby.id).emit('gameOver',this.blockManager.getLatestBlock());
+                        
+            connection.socket.emit('lobbyUpdate', returnLobbyData);
+            connection.socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
         }
     }
 
