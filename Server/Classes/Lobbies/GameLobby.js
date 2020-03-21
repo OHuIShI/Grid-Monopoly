@@ -362,8 +362,33 @@ module.exports = class GameLobbby extends LobbyBase {
 
         if (gameManager.lapsToGo > 0) {
             if (lobby.playersID.length == 1) {
+                let winnerIndex = 0;
+                let winner;
+                let ranking = [];
+                let bankruptPlayer = [];
+    
+                for (var key in connections) ranking.push(key);
+    
+                ranking.sort(function (a, b) {
+                    console.log("sorting");
+    
+                    console.log(connections[b].player.assets - connections[a].player.assets);
+                    return connections[b].player.assets - connections[a].player.assets;
+                })
+                console.log('after sorting');
+                console.log(ranking);
+                /*
+                for (let i = 0; i < gameManager.CurrentPlayer; i++) {
+                    if (connections[playersID[i]].player.assets > connections[playersID[winnerIndex]].player.assets) {
+                        winnerIndex = i;
+                    }
+                }
+                console.log('gameOver, winner: ', connections[playersID[winnerIndex]].player.id);
+                */
+                
                 let returnData = {
-                    winner: connections[playersID[0]].player.id
+                    winner: ranking[0],
+                    ranking: ranking
                 }
                 lobby.blockManager.createNewBlock('gameOver', returnData);
                 connection.socket.emit('gameOver',this.blockManager.getLatestBlock());
@@ -376,21 +401,40 @@ module.exports = class GameLobbby extends LobbyBase {
                     id: nextTurnID,
                     lapsToGo: gameManager.lapsToGo
                 }
-                lobby.blockManager.createNewBlock('gameOver', returnData);
+                lobby.blockManager.createNewBlock('updateTurn', returnData);
                 connection.socket.emit('updateTurn',this.blockManager.getLatestBlock());
                 connection.socket.broadcast.to(lobby.id).emit('updateTurn',this.blockManager.getLatestBlock());
             }
         } else {
             let winnerIndex = 0;
+            let winner;
+            let ranking = [];
+            let bankruptPlayer = [];
+
+            for (var key in connections) ranking.push(key);
+
+            ranking.sort(function (a, b) {
+                console.log("sorting");
+
+                console.log(connections[b].player.assets - connections[a].player.assets);
+                return connections[b].player.assets - connections[a].player.assets;
+            })
+            console.log('after sorting');
+            console.log(ranking);
+            /*
             for (let i = 0; i < gameManager.CurrentPlayer; i++) {
                 if (connections[playersID[i]].player.assets > connections[playersID[winnerIndex]].player.assets) {
                     winnerIndex = i;
                 }
             }
             console.log('gameOver, winner: ', connections[playersID[winnerIndex]].player.id);
+            */
+            
             let returnData = {
-                winner: connections[playersID[winnerIndex]].player.id
+                winner: ranking[0],
+                ranking: ranking
             }
+            console.log(returnData);
             lobby.blockManager.createNewBlock('gameOver', returnData);
             connection.socket.emit('gameOver',this.blockManager.getLatestBlock());
             connection.socket.broadcast.to(lobby.id).emit('gameOver',this.blockManager.getLatestBlock());
