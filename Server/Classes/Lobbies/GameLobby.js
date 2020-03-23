@@ -254,6 +254,7 @@ module.exports = class GameLobbby extends LobbyBase {
             console.log(connections[lobby.playersID[0]].player.isMyTurn);
             console.log(connections[lobby.playersID[1]].player.isMyTurn);
             lobby.gameManager.turnIndex = 0;
+            lobby.gameManager.lapsToGo = lobby.gameManager.lapsToGo - 1;
             let returnData = {
                 id: lobby.playersID[0],
                 lapsToGo: lobby.gameManager.lapsToGo
@@ -359,9 +360,8 @@ module.exports = class GameLobbby extends LobbyBase {
         let gameManager = lobby.gameManager;
         let connections = lobby.connections;
         let playersID = lobby.playersID;
-        gameManager.lapsToGo = gameManager.lapsToGo - 1;
-
-        if (gameManager.lapsToGo > 0) {
+        
+        if (gameManager.lapsToGo >= 0) {
             if (lobby.playersID.length == 1) {
                 let winnerIndex = 0;
                 let winner;
@@ -405,6 +405,13 @@ module.exports = class GameLobbby extends LobbyBase {
             } else {
                 let nextTurnIndex = gameManager.updateTurnIndex();
                 let nextTurnID = connections[playersID[nextTurnIndex]].player.id;
+
+                if (nextTurnID == lobby.playersID[0])
+                {
+                    gameManager.lapsToGo = gameManager.lapsToGo - 1;
+                    if (gameManager.lapsToGo < 0)
+                        return this.turnOver(connection);
+                }
 
                 let returnData = {
                     id: nextTurnID,
