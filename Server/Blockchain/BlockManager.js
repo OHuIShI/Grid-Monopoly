@@ -30,5 +30,4 @@ module.exports = class BlockManager {
     getLatestBlock(){
         return getLatestBlock(this.gameLobbyID);
     }
-    
 }                   
