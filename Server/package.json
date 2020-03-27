@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "crypto-js": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.9.6",
     "shortid": "^2.2.15",
     "socket.io": "^2.3.0"
   },
@@ -20,6 +22,8 @@
     "typescript": "^3.8.3"
   },
   "babel": {
-    "presets": ["env"]
+    "presets": [
+      "env"
+    ]
   }
 }

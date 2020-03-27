@@ -1,12 +1,15 @@
+require('dotenv').config();
 let io = require('socket.io')(process.env.PORT || 52300);
 let Server = require('./Classes/Server');
 let DB = require('./Database/db.js');
 let User = require('./Database/user.js');
+let BlockChain = require('./Database/blockchain.js');
+let Game = require('./Database/game.js');
 let crypto = require('crypto');
 console.log('Server has started');
 
 DB();
-
+/*
 let testUser = new User({
     // id: String,
     // password: { type: String, required: true },
@@ -33,6 +36,34 @@ testUser.save(function(err){
     console.log("save complete");
     //res.json({result: 1});
   });
+
+
+var query  = User.where({ id: 'test' });
+query.findOne(function (err, user) {
+  if (err) return handleError(err);
+  if (user) {
+    // doc may be null if no document matched
+    let game = new Game({
+      users: [user]
+    });
+    game.save(function(err){
+      if(err){
+        console.error(err);
+        return;
+      }
+      console.log("save complete");
+    })
+  }
+});
+
+Game.find({}, function(err, arr) {
+  if(arr){
+    console.log(arr);
+  }
+});
+*/
+
+
 let server = new Server(); 
 
 setInterval(() => {
