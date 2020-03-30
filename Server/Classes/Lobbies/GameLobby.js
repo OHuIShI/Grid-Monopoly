@@ -75,6 +75,7 @@ module.exports = class GameLobbby extends LobbyBase {
                     players: lobby.playersID,
                     initialGameData : initialGameData
                 }
+                
                 DBManager.saveGame(this.gameLobbyID, this.playersID);
                 lobby.blockManager.createGenesis(blockData);
                 socket.emit('setBlockChain',this.blockManager.getLatestBlock()); 

@@ -40,7 +40,7 @@ const createGenesisBlock = (gameLobbyID : string, blockData : object): Block => 
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain: Block[] = [genesisBlock];
     blockchains[gameLobbyID] = blockchain;
-    //saveBlock(gameLobbyID, genesisBlock);
+    saveBlock(gameLobbyID, genesisBlock);
     return genesisBlock;
 };
 
@@ -118,7 +118,7 @@ const calculateHash = (index: number, previousHash: string, timestamp: string, d
 const addBlock = (newBlock: Block, gameLobbyID : string) => {
     // 새롭게 추가될 블록이 유효한 것인지를 확인하는 과정이다. 
     if (isValidNewBlock(newBlock, getLatestBlock(gameLobbyID))) {
-        //saveBlock(gameLobbyID, newBlock);
+        saveBlock(gameLobbyID, newBlock);
         blockchains[gameLobbyID].push(newBlock);
     }
 };
