@@ -1,9 +1,10 @@
 module.exports = class Connection {
     constructor() {
         this.socket;
-        this.player;
+        this.user;
         this.server;
         this.lobby;
+        this.player;
     }
 
     //Handles all our io events and where we should route them too to be handled
@@ -11,7 +12,6 @@ module.exports = class Connection {
         let connection = this;
         let socket = connection.socket;
         let server = connection.server;
-        let player = connection.player;
 
         socket.on('joinGame', function() {
             server.onAttemptToJoinGame(connection);

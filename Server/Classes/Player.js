@@ -1,11 +1,10 @@
-let shortID = require('shortid');
 let Vector2 = require('./Vector2.js');
+let User = require('./User');
 
-module.exports = class Player {
-    constructor() {
-        this.username = 'TESTUSER';
-        this.id = shortID.generate();
-        this.lobby = 0;
+module.exports = class Player extends User {
+    constructor(user = User) {
+        super();
+        this.copyUserInfo(user);
         this.order = -1;
         this.position = new Vector2();
         this.isMyTurn = false;
@@ -37,12 +36,8 @@ module.exports = class Player {
         this.dist = data.dist;
     }
 
-    displayerPlayerInformation() {
-        let player = this;
-        return '(' + player.username + ':' + player.id + ')';
-    }
-
     showPlayerData() {
+        super.showUserData();
         console.log(JSON.stringify(this));
     }
 }

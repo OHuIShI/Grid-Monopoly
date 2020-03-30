@@ -1,8 +1,9 @@
 let Connection = require('./Connection')
-let Player = require('./Player')
+let User = require('./User')
 
 //Lobbies
 let LobbyBase = require('./Lobbies/LobbyBase')
+let HomeLobby = require('./Lobbies/HomeLobby')
 let GameLobby = require('./Lobbies/GameLobby')
 let GameLobbySettings = require('./Lobbies/GameLobbySettings')
 
@@ -29,17 +30,17 @@ module.exports = class Server {
         let server = this;
         let connection = new Connection();
         connection.socket = socket;
-        connection.player = new Player();
+        connection.user = new User();
         connection.server = server;
 
-        let player = connection.player;
+        let user = connection.user;
         let lobbys = server.lobbys;
 
-        console.log('Added new player to the server (' + player.id + ')');
-        server.connections[player.id] = connection;
+        console.log('Added new user to the server (' + user.id + ')');
+        server.connections[user.id] = connection;
 
-        socket.join(player.lobby);
-        connection.lobby = lobbys[player.lobby];
+        socket.join(user.lobby);
+        connection.lobby = lobbys[user.lobby];
         connection.lobby.onEnterLobby(connection);
 
         return connection;
@@ -47,18 +48,18 @@ module.exports = class Server {
 
     onDisconnected(connection = Connection) {
         let server = this;
-        let id = connection.player.id;
+        let id = connection.user.id;
 
         delete server.connections[id];
-        console.log('Player ' + connection.player.displayerPlayerInformation() + ' has disconnected');
+        console.log('User ' + connection.user.displayUserInformation() + ' has disconnected');
 
         //Tell Other players currently in the lobby that we have disconnected from the game
-        connection.socket.broadcast.to(connection.player.lobby).emit('disconnected', {
+        connection.socket.broadcast.to(connection.user.lobby).emit('disconnected', {
             id: id
         });
 
         //Preform lobby clean up
-        let currentLobbyIndex = connection.player.lobby;
+        let currentLobbyIndex = connection.user.lobby;
         //server.lobbys[connection.player.lobby].onLeaveLobby(connection);
         server.lobbys[currentLobbyIndex].onLeaveLobby(connection);
         
@@ -107,7 +108,7 @@ module.exports = class Server {
         connection.socket.join(lobbyID); // Join the new lobby's socket channel
         connection.lobby = lobbys[lobbyID];//assign reference to the new lobby
 
-        lobbys[connection.player.lobby].onLeaveLobby(connection);
+        lobbys[connection.user.lobby].onLeaveLobby(connection);
         lobbys[lobbyID].onEnterLobby(connection);
     }
 }
