@@ -6,6 +6,7 @@ let GameManager = require('../GameManager.js');
 let initialGameData = require('../../GameData/SampleScene.json');
 let LobbyState = require('../Utility/LobbyState');
 let BlockManager = require('../../Blockchain/BlockManager.js');
+let DBManager = require('../DBManager.js');
 var shortID = require('shortid');
 
 module.exports = class GameLobbby extends LobbyBase {
@@ -74,6 +75,7 @@ module.exports = class GameLobbby extends LobbyBase {
                     players: lobby.playersID,
                     initialGameData : initialGameData
                 }
+                DBManager.saveGame(this.gameLobbyID, this.playersID);
                 lobby.blockManager.createGenesis(blockData);
                 socket.emit('setBlockChain',this.blockManager.getLatestBlock()); 
                 socket.broadcast.to(lobby.id).emit('setBlockChain',this.blockManager.getLatestBlock());

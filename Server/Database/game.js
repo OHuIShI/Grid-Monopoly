@@ -5,7 +5,8 @@ mongoose.set('useCreateIndex', true);
 const gameSchema = new Schema({
     gameLobbyID:{type: String, required: true},
     create_date: { type:Date, default:Date.now },
-    users: [{type: Schema.Types.ObjectId, ref: 'user', required: true}],
+    //users: [{type: Schema.Types.ObjectId, ref: 'user', required: true}],
+    users:[{type:String, required: true}],
     blocks: [{type: Schema.Types.ObjectId, ref: 'block'}]
 });
 

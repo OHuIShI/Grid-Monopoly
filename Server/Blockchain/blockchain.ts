@@ -2,7 +2,8 @@ import * as CryptoJS from 'crypto-js';
 //let CryptoJS = require('crypto-js');
 //import {broadcastLatest} from './p2p';
 // 새롭게 import 되었다. 
-import {hexToBinary} from './util';
+import { hexToBinary } from './util';
+import { saveBlock } from '../Classes/DBManager.js';
 //let hexToBinary = require('./util');
 // Block 의 class 를 설정한다. 
 
@@ -39,6 +40,7 @@ const createGenesisBlock = (gameLobbyID : string, blockData : object): Block => 
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain: Block[] = [genesisBlock];
     blockchains[gameLobbyID] = blockchain;
+    //saveBlock(gameLobbyID, genesisBlock);
     return genesisBlock;
 };
 
@@ -116,6 +118,7 @@ const calculateHash = (index: number, previousHash: string, timestamp: string, d
 const addBlock = (newBlock: Block, gameLobbyID : string) => {
     // 새롭게 추가될 블록이 유효한 것인지를 확인하는 과정이다. 
     if (isValidNewBlock(newBlock, getLatestBlock(gameLobbyID))) {
+        //saveBlock(gameLobbyID, newBlock);
         blockchains[gameLobbyID].push(newBlock);
     }
 };
