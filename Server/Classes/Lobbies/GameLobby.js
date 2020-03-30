@@ -1,6 +1,6 @@
-let LobbyBase = require('./LobbyBase')
-let GameLobbySettings = require('./GameLobbySettings')
-let Connection = require('../Connection')
+let LobbyBase = require('./LobbyBase');
+let GameLobbySettings = require('./GameLobbySettings');
+let Connection = require('../Connection');
 let LandManager = require('../LandManager.js');
 let GameManager = require('../GameManager.js');
 let initialGameData = require('../../GameData/SampleScene.json');
@@ -8,6 +8,7 @@ let LobbyState = require('../Utility/LobbyState');
 let BlockManager = require('../../Blockchain/BlockManager.js');
 let DBManager = require('../DBManager.js');
 var shortID = require('shortid');
+let Player = require('../Player');
 
 module.exports = class GameLobbby extends LobbyBase {
     constructor(id, settings = GameLobbySettings) {
@@ -86,6 +87,7 @@ module.exports = class GameLobbby extends LobbyBase {
     onEnterLobby(connection = Connection) {
         let lobby = this;
         let socket = connection.socket;
+        connection.player = new Player(connection.user);
         let player = connection.player;
 
         super.onEnterLobby(connection);
@@ -123,7 +125,7 @@ module.exports = class GameLobbby extends LobbyBase {
         //LobbyState.js에 기록한대로 나중에 GameLobby State를 따로 만들면 좋을 듯
         //socket.emit('OnEnterGameLobby', returnData);
         socket.broadcast.to(lobby.id).emit('OnEnterGameLobby', returnData);
-        
+
         for (let i in lobby.playersID){
             console.log(lobby.playersID[i]);
             let returnData = {
