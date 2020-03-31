@@ -2,7 +2,7 @@ let shortID = require('shortid');
 
 module.exports = class User {
     constructor() {
-        this.username = 'Non_member'; // 로그인하면 바꿔야함
+        this.username = 'guest'; // 로그인하면 바꿔야함
         this.id = shortID.generate(); // 로그인하면 바꿔야함
         this.lobby = 0;
     }
