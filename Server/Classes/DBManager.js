@@ -13,7 +13,7 @@ function done(err, result) {
   return result;
 }
 // 블록체인 
-function saveBlock(gameLobbyID, block) {
+async function saveBlock(gameLobbyID, block) {
   console.log("save Block - start");
   let game = getGame(gameLobbyID);
   console.log("game id = " + game._id);
@@ -36,7 +36,7 @@ function saveBlock(gameLobbyID, block) {
       });
   }
   */
-  newBlock.save({ newBlock })
+  await newBlock.save({ newBlock })
     .then((result) => {
       console.log("save block - done");
       console.log(result);
@@ -49,7 +49,10 @@ function saveBlock(gameLobbyID, block) {
 }
 
 // 게임
-function saveGame(gameLobbyID, playersID) {
+function saveGame(gameLobbyID, playersID, callbackFunc, blockData) {
+
+  return new Promise(function (resolve, reject) {
+    
   console.log("save Game");
 
   let userObjectId = [];
@@ -63,31 +66,39 @@ function saveGame(gameLobbyID, playersID) {
     users: userObjectId,
     blocks: []
   })
+    
+    /*
+  newGame.save(function (err, block) {
+    if (err) {
+      console.error(err);
+      reject(err);
+    }
+    if (block) {
+      console.log("[DB] save complete - game");
+      resolve();
+    }
+  });
+    */
+    
 
-  /*
-    //newGame.save(done); 
-    newGame.save(function (err, block) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      if (block) {
-        console.log("[DB] save complete - game");
-        return block;
-      }
-    });
-  */
-  newGame.save({ newGame })
+  
+    newGame.save({ newGame })
     .then((result) => {
       console.log("save game");
       console.log(result);
+      //callbackFunc(blockData);
+      
+    resolve('save Game end');
       return result;
     })
     .catch((err) => {
       console.log("error occured");
       console.log(err);
     })
+
+  })
 }
+
 function getGame(gameLobbyID) {
   var query = Game.where({ gameLobbyID: gameLobbyID });
   query.findOne(function (err, block) {

@@ -12,7 +12,6 @@ const CryptoJS = __importStar(require("crypto-js"));
 //import {broadcastLatest} from './p2p';
 // 새롭게 import 되었다. 
 const util_1 = require("./util");
-const DBManager_js_1 = require("../Classes/DBManager.js");
 //let hexToBinary = require('./util');
 // Block 의 class 를 설정한다. 
 class Block {
@@ -35,7 +34,6 @@ const createGenesisBlock = (gameLobbyID, blockData) => {
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain = [genesisBlock];
     blockchains[gameLobbyID] = blockchain;
-    DBManager_js_1.saveBlock(gameLobbyID, genesisBlock);
     return genesisBlock;
 };
 exports.createGenesisBlock = createGenesisBlock;
@@ -112,7 +110,6 @@ const calculateHash = (index, previousHash, timestamp, data, difficulty, nonce) 
 const addBlock = (newBlock, gameLobbyID) => {
     // 새롭게 추가될 블록이 유효한 것인지를 확인하는 과정이다. 
     if (isValidNewBlock(newBlock, getLatestBlock(gameLobbyID))) {
-        DBManager_js_1.saveBlock(gameLobbyID, newBlock);
         blockchains[gameLobbyID].push(newBlock);
     }
 };
