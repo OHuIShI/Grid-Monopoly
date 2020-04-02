@@ -51,7 +51,9 @@ const genesisBlock: Block = new Block(
 
 const getBlockchain = (gameLobbyID: string): Block[] => blockchains[gameLobbyID];
 // 마지막 블록의 정보를 가지고 오는 과정이다. 현 체인의 길이에서 - 1 을 한 index 를 가지고 있는 블록의 정보를 가지고 온다.
-const getLatestBlock = (gameLobbyID: string): Block => blockchains[gameLobbyID][blockchains[gameLobbyID].length - 1];
+const getLatestBlock = (gameLobbyID: string): Block => {
+    return blockchains[gameLobbyID][blockchains[gameLobbyID].length - 1];
+}
 
 // 블록 생성 주기를 설정해준다. in seconds
 const BLOCK_GENERATION_INTERVAL: number = 10;
@@ -86,7 +88,6 @@ const getCurrentTimestamp = (): string => Math.round(new Date().getTime() / 1000
 const generateNextBlock = (blockData: object, gameLobbyID : string) => {
     const previousBlock: Block = getLatestBlock(gameLobbyID);              // 새로운 블록을 만들 때 그 전 블록으로 현 체인의 마지막 블록을 설정한다. 
     const difficulty: number = getDifficulty(getBlockchain(gameLobbyID));
-    console.log('difficulty: ' + difficulty);
     const nextIndex: number = previousBlock.index + 1;          // index 를 설정하는 과정이다.
     const nextTimestamp: string = getCurrentTimestamp();        // #1 에서 약간 더 발전했다. 
     const newBlock: Block = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, difficulty);

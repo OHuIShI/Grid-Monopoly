@@ -13,105 +13,76 @@ function done(err, result) {
   return result;
 }
 // 블록체인 
-async function saveBlock(gameLobbyID, block) {
-  console.log("save Block - start");
-  let game = getGame(gameLobbyID);
-  console.log("game id = " + game._id);
-
-  let newBlock = new BlockChain({
-    gameId: game._id,
-    block: block
+function saveBlock(gameLobbyID, block) {
+  return new Promise(function (resolve, reject) {
+    console.log("save Block - start");
+    // let game = getGame(gameLobbyID);
+    getGame(gameLobbyID)
+      .then(data => {
+        let game = data;
+        let newBlock = new BlockChain({
+          gameId: game._id,
+          block: block
+        })
+        newBlock.save({ newBlock })
+          .then((result) => {
+            game.blocks.push(result);
+            game.save({game})
+            .then((result => {
+              resolve();
+            }))
+          })
+          .catch((err) => {
+            console.log("error occured");
+            reject(err);
+          })
+      })
   })
-  /*
-    newBlock.save(function (err, block) {
-        if(err){
-          console.error(err);
-          return;
-        }
-        if(block){
-            console.log("[DB] save complete - block");
-            game.block.push(block);
-            game.save(done);
-        }
-      });
-  }
-  */
-  await newBlock.save({ newBlock })
-    .then((result) => {
-      console.log("save block - done");
-      console.log(result);
-      return result;
-    })
-    .catch((err) => {
-      console.log("error occured");
-      console.log(err);
-    })
 }
 
 // 게임
-function saveGame(gameLobbyID, playersID, callbackFunc, blockData) {
+function saveGame(gameLobbyID, playersID) {
 
   return new Promise(function (resolve, reject) {
-    
-  console.log("save Game");
 
-  let userObjectId = [];
+    let userObjectId = [];
 
-  playersID.forEach(player => {
-    userObjectId.push(player);
-  });
+    playersID.forEach(player => {
+      userObjectId.push(player);
+    });
 
-  let newGame = new Game({
-    gameLobbyID: gameLobbyID,
-    users: userObjectId,
-    blocks: []
-  })
-    
-    /*
-  newGame.save(function (err, block) {
-    if (err) {
-      console.error(err);
-      reject(err);
-    }
-    if (block) {
-      console.log("[DB] save complete - game");
-      resolve();
-    }
-  });
-    */
-    
-
-  
+    let newGame = new Game({
+      gameLobbyID: gameLobbyID,
+      users: userObjectId,
+      blocks: []
+    })
     newGame.save({ newGame })
-    .then((result) => {
-      console.log("save game");
-      console.log(result);
-      //callbackFunc(blockData);
-      
-    resolve('save Game end');
-      return result;
-    })
-    .catch((err) => {
-      console.log("error occured");
-      console.log(err);
-    })
+      .then((result) => {
+        resolve('save Game end');
+        return result;
+      })
+      .catch((err) => {
+        console.log("error occured");
+        console.log(err);
+      })
 
   })
 }
 
 function getGame(gameLobbyID) {
-  var query = Game.where({ gameLobbyID: gameLobbyID });
-  query.findOne(function (err, block) {
-    console.log("findOne");
-    if (err) {
-      console.error(err);
-      return;
-    }
-    if (block) {
-      console.log("[DB] find complete - game");
-      return block;
-    }
-  });
+  return new Promise(function (resolve, reject) {
+    var query = Game.where({ gameLobbyID: gameLobbyID });
+    query.findOne(function (err, block) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      if (block) {
+        resolve(block);
+      }
+    });
+  })
+
 }
 
 

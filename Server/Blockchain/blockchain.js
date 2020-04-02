@@ -34,6 +34,8 @@ const createGenesisBlock = (gameLobbyID, blockData) => {
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain = [genesisBlock];
     blockchains[gameLobbyID] = blockchain;
+    console.log("after createGenesisBlock blockchain length");
+    console.log(blockchains[gameLobbyID].length);
     return genesisBlock;
 };
 exports.createGenesisBlock = createGenesisBlock;
@@ -47,7 +49,12 @@ const genesisBlock: Block = new Block(
 const getBlockchain = (gameLobbyID) => blockchains[gameLobbyID];
 exports.getBlockchain = getBlockchain;
 // 마지막 블록의 정보를 가지고 오는 과정이다. 현 체인의 길이에서 - 1 을 한 index 를 가지고 있는 블록의 정보를 가지고 온다.
-const getLatestBlock = (gameLobbyID) => blockchains[gameLobbyID][blockchains[gameLobbyID].length - 1];
+const getLatestBlock = (gameLobbyID) => {
+    console.log("getLatestBlock - start");
+    console.log("gameLobbyId = " + gameLobbyID);
+    console.log("blockchains[gameLobbyId] = " + blockchains[gameLobbyID][0]);
+    return blockchains[gameLobbyID][blockchains[gameLobbyID].length - 1];
+};
 exports.getLatestBlock = getLatestBlock;
 // 블록 생성 주기를 설정해준다. in seconds
 const BLOCK_GENERATION_INTERVAL = 10;
