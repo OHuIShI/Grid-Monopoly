@@ -14,7 +14,11 @@ module.exports = class Connection {
         let server = connection.server;
 
         socket.on('joinGame', function() {
-            server.onAttemptToJoinGame(connection);
+            connection.lobby.onAttemptToJoinGame(connection);
+        });
+
+        socket.on('setUserInfo', function(data) {
+            connection.lobby.setUserInfo(connection, data);
         });
 
         socket.on('enteredGame', function () {

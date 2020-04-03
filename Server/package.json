@@ -14,7 +14,8 @@
     "dotenv": "^8.2.0",
     "mongoose": "^5.9.6",
     "shortid": "^2.2.15",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "socketio-auth": "^0.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

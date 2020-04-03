@@ -76,11 +76,14 @@ function getGame(gameLobbyID){
 }
 
 //User
-function saveUser() {
-
+function saveUser(data) {
+  // id: { type: String, required: true, unique: true},
+  // password: { type: String, required: true },
+  // name : { type: String, required: true, unique: true },
+  // email: { type: String, required: true },
   let newUser = new User({
-      id:
-      pr189
+      id: data.id,
+      name: data.name
   })
 
   newUser.save(done);
@@ -92,3 +95,4 @@ function getUserObjectID(id) {
 
 exports.saveBlock = saveBlock;
 exports.saveGame = saveGame;
+exports.saveUser = saveUser;

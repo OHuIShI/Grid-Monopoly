@@ -4,7 +4,6 @@ let Server = require('./Classes/Server');
 let DB = require('./Database/db.js');
 
 console.log('Server has started');
-
 DB();
 
 let server = new Server(); 

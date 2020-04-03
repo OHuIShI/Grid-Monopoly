@@ -6,6 +6,7 @@ module.exports = class User {
         this.id = shortID.generate(); // 로그인하면 바꿔야함
         this.lobby = 0;
     }
+    
     copyUserInfo(user = User){
         this.username = user.username;
         this.id = user.id;

@@ -11,8 +11,7 @@ module.exports = class Server {
     constructor() {
         this.connections = [];
         this.lobbys = [];
-
-        this.lobbys[0] = new LobbyBase(0);
+        this.lobbys[0] = new HomeLobby(0);
     }
 
     //Interval update every 100 miliseconds
@@ -30,8 +29,8 @@ module.exports = class Server {
         let server = this;
         let connection = new Connection();
         connection.socket = socket;
-        connection.user = new User();
         connection.server = server;
+        connection.user = new User();
 
         let user = connection.user;
         let lobbys = server.lobbys;
@@ -66,38 +65,6 @@ module.exports = class Server {
         if(server.lobbys[currentLobbyIndex] != 0 && Object.keys(server.lobbys[currentLobbyIndex].connections).length == 0){
             console.log('Closing down lobby ('+currentLobbyIndex+')');
             server.lobbys.splice(currentLobbyIndex, 1);
-        }
-    }
-
-    onAttemptToJoinGame(connection = Connection) {
-        //Look through lobbies for a gamelobby
-        //check if joinable
-        //if not make a new game
-        let server = this;
-        let lobbyFound = false;
-
-        let gameLobbies = server.lobbys.filter(item => {
-            return item instanceof GameLobby;
-        });
-        console.log('Found (' + gameLobbies.length + ') lobbies on the server');
-
-        gameLobbies.forEach(lobby => {
-            if(!lobbyFound) {
-                let canJoin = lobby.canEnterLobby(connection);
-
-                if(canJoin) {
-                    lobbyFound = true;
-                    server.onSwitchLobby(connection, lobby.id);
-                }
-            }
-        });
-
-        //All game lobbies full or we have never created one
-        if(!lobbyFound) {
-            console.log('Making a new game lobby');
-            let gamelobby = new GameLobby(gameLobbies.length + 1, new GameLobbySettings('Classic', 2));
-            server.lobbys.push(gamelobby);
-            server.onSwitchLobby(connection, gamelobby.id);
         }
     }
 
