@@ -3,37 +3,37 @@ let BlockChain = require('../Database/blockchain.js');
 let Game = require('../Database/game.js');
 let crypto = require('crypto');
 
-function done (err, result) {
+function done(err, result) {
   if (err) {
     console.log("error occured");
-      console.error(err);
-      return;
+    console.error(err);
+    return;
   }
   console.log("save-complete");
   return result;
 }
 // 블록체인 
-function saveBlock(gameLobbyID, block){
-/*
-  let game = getGame(gameLobbyID);
-
-  let newBlock = new BlockChain({
-      gameId : game._id,
-      block : block
-  })
-
-  newBlock.save(function(err, block){
-      if(err){
-        console.error(err);
-        return;
-      }
-      if(block){
-          console.log("[DB] save complete - block");
-          game.block.push(block);
-          game.save(done);
-      }
-    });
-    */
+function saveBlock(gameLobbyID, block) {
+  /*
+    let game = getGame(gameLobbyID);
+  
+    let newBlock = new BlockChain({
+        gameId : game._id,
+        block : block
+    })
+  
+    newBlock.save(function(err, block){
+        if(err){
+          console.error(err);
+          return;
+        }
+        if(block){
+            console.log("[DB] save complete - block");
+            game.block.push(block);
+            game.save(done);
+        }
+      });
+      */
 }
 
 // 게임
@@ -70,7 +70,7 @@ function saveGame(gameLobbyID, playersID) {
   */
 }
 
-function getGame(gameLobbyID){
+function getGame(gameLobbyID) {
   var query = Game.where({ gameLobbyID: gameLobbyID });
   query.findOne(done);
 }
@@ -81,12 +81,26 @@ function saveUser(data) {
   // password: { type: String, required: true },
   // name : { type: String, required: true, unique: true },
   // email: { type: String, required: true },
-  let newUser = new User({
+  return new Promise(function (resolve, reject) {
+    let newUser = new User({
       id: data.id,
       name: data.name
-  })
-
-  newUser.save(done);
+    });
+    User.findOne({ name: data.name })
+      .then((result) => {
+        //return Users.update({ name: result.name }, { updated: true });
+        if (result == null) { // 원래 있던 유저가 아니면
+          newUser.save(done);
+          resolve(result);
+        } else {
+          // exist user!
+          resolve(result);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }
 
 function getUserObjectID(id) {

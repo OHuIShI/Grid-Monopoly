@@ -14,7 +14,18 @@ module.exports = class HomeLobby extends LobbyBase {
     setUserInfo(connection = Connection, data) {
         connection.user.username = data.username;
         //console.log(connection.user.displayUserInformation());
-        DBManager.saveUser({id: connection.user.id, name: connection.user.username});
+        DBManager.saveUser({id: connection.user.id, name: connection.user.username})
+        .then((result) => {
+            if(result == null){
+                connection.socket.emit('signupResult',{result:"success"});
+            } else {
+                console.log("exist user"+result);
+                connection.socket.emit('signupResult',{result:"exist"});
+            }
+        }).catch((err) => {
+            console.log(err);
+            //connection.socket.emit('signupResult',{result:"fail"});
+        });
     }
 
     onAttemptToJoinGame(connection = Connection) {
