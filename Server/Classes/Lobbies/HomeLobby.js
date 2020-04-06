@@ -8,7 +8,6 @@ let DBManager = require('../DBManager.js');
 module.exports = class HomeLobby extends LobbyBase {
     constructor(id){
         super(id);
-        this.blockManager = new BlockManager();
     }
     
     setUserInfo(connection = Connection, data) {
