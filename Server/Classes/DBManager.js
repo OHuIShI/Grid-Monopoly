@@ -14,73 +14,77 @@ function done(err, result) {
 }
 // 블록체인 
 function saveBlock(gameLobbyID, block) {
-  /*
-    let game = getGame(gameLobbyID);
-  
-    let newBlock = new BlockChain({
-        gameId : game._id,
-        block : block
-    })
-  
-    newBlock.save(function(err, block){
-        if(err){
-          console.error(err);
-          return;
-        }
-        if(block){
-            console.log("[DB] save complete - block");
-            game.block.push(block);
-            game.save(done);
-        }
-      });
-      */
+  return new Promise(function (resolve, reject) {
+    console.log("save Block - start");
+    // let game = getGame(gameLobbyID);
+    getGame(gameLobbyID)
+      .then(data => {
+        let game = data;
+        let newBlock = new BlockChain({
+          gameId: game._id,
+          block: block
+        })
+        newBlock.save({ newBlock })
+          .then((result) => {
+            game.blocks.push(result);
+            game.save({game})
+            .then((result => {
+              resolve();
+            }))
+          })
+          .catch((err) => {
+            console.log("error occured");
+            reject(err);
+          })
+      })
+  })
 }
 
 // 게임
 function saveGame(gameLobbyID, playersID) {
-  /*
-  console.log("save Game");
-  console.log("gameLobbyID = " + gameLobbyID);
-  console.log("playersID = " + playersID);
 
-  let userObjectId = [];
+  return new Promise(function (resolve, reject) {
 
-  playersID.forEach(player => {
-      userObjectId.push(getUserObjectID(player));
-  });
-  
-  let newGame = new Game({
-      gameLobbyID : gameLobbyID,
+    let userObjectId = [];
+
+    playersID.forEach(player => {
+      userObjectId.push(player);
+    });
+
+    let newGame = new Game({
+      gameLobbyID: gameLobbyID,
       users: userObjectId,
       blocks: []
+    })
+    newGame.save({ newGame })
+      .then((result) => {
+        resolve('save Game end');
+        return result;
+      })
+      .catch((err) => {
+        console.log("error occured");
+        console.log(err);
+      })
+
   })
-  console.log("save Game");
-  
-  //newGame.save(done); 
-  newGame.save(function(err, block){
-    if(err){
-      console.error(err);
-      return;
-    }
-    if(block){
-      console.log("[DB] save complete - game");
-      return block;
-    }
-  });
-  */
 }
 
 function getGame(gameLobbyID) {
-  var query = Game.where({ gameLobbyID: gameLobbyID });
-  query.findOne(done);
+  return new Promise(function (resolve, reject) {
+    var query = Game.where({ gameLobbyID: gameLobbyID });
+    query.findOne(function (err, block) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      if (block) {
+        resolve(block);
+      }
+    });
+  })
 }
 
-//User
 function saveUser(data) {
-  // id: { type: String, required: true, unique: true},
-  // password: { type: String, required: true },
-  // name : { type: String, required: true, unique: true },
-  // email: { type: String, required: true },
   return new Promise(function (resolve, reject) {
     let newUser = new User({
       id: data.id,
@@ -102,7 +106,6 @@ function saveUser(data) {
       });
   });
 }
-
 function getUserObjectID(id) {
 
 }
