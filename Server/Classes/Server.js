@@ -62,7 +62,7 @@ module.exports = class Server {
         //server.lobbys[connection.player.lobby].onLeaveLobby(connection);
         server.lobbys[currentLobbyIndex].onLeaveLobby(connection);
         
-        if(server.lobbys[currentLobbyIndex] != 0 && Object.keys(server.lobbys[currentLobbyIndex].connections).length == 0){
+        if(currentLobbyIndex != 0 && Object.keys(server.lobbys[currentLobbyIndex].connections).length == 0){
             console.log('Closing down lobby ('+currentLobbyIndex+')');
             server.lobbys.splice(currentLobbyIndex, 1);
         }
