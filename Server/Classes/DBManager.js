@@ -55,6 +55,7 @@ function saveGame(gameLobbyID, playersID) {
     })
     newGame.save({ newGame })
       .then((result) => {
+        resolve();
         return result;
       })
       .catch((err) => {
