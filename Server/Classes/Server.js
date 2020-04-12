@@ -67,14 +67,14 @@ module.exports = class Server {
             server.lobbys.splice(currentLobbyIndex, 1);
         }
     }
-
+    
     onSwitchLobby(connection = Connection, lobbyID) {
         let server = this;
         let lobbys = server.lobbys;
 
         connection.socket.join(lobbyID); // Join the new lobby's socket channel
         connection.lobby = lobbys[lobbyID];//assign reference to the new lobby
-
+        
         lobbys[connection.user.lobby].onLeaveLobby(connection);
         lobbys[lobbyID].onEnterLobby(connection);
     }

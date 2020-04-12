@@ -99,6 +99,8 @@ module.exports = class GameLobbby extends LobbyBase {
         let player = connection.player;
 
         super.onEnterLobby(connection);
+        player.lobby = this.id;
+        connection.user.lobby = this.id;
         lobby.playersID.push(connection.player.id);
 
         lobby.lobbyState.currentState = lobby.lobbyState.GAMELOBBY;
@@ -199,7 +201,6 @@ module.exports = class GameLobbby extends LobbyBase {
         let lobby = this;
 
         super.onLeaveLobby(connection);
-
         lobby.removePlayer(connection);
 
         //Handle unspawning any server spawned objects here
@@ -208,12 +209,11 @@ module.exports = class GameLobbby extends LobbyBase {
 
     removePlayer(connection = Connection) {
         let lobby = this;
-
+  
         lobby.gameManager.CurrentPlayer = lobby.gameManager.CurrentPlayer - 1;
         let index = lobby.playersID.indexOf(connection.player.id);
         lobby.playersID.splice(index, 1);
-        console.log(lobby.playersID);
-
+        console.log("left players: "+lobby.playersID);
         connection.socket.broadcast.to(lobby.id).emit('disconnected', {
             id: connection.player.id
         });

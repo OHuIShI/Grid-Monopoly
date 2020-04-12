@@ -56,6 +56,10 @@ module.exports = class Connection {
         socket.on('updateBalance', function (data) {
             connection.lobby.updateBalance(connection, data); 
         });
+
+        socket.on('LeaveGameLobby', function (){
+            connection.server.onSwitchLobby(connection, 0);
+        });
         
         socket.on('disconnect', function(){
             console.log('A player has disconnected');
