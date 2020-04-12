@@ -9,14 +9,11 @@ function done(err, result) {
     console.error(err);
     return;
   }
-  console.log("save-complete");
   return result;
 }
 // 블록체인 
 function saveBlock(gameLobbyID, block) {
   return new Promise(function (resolve, reject) {
-    console.log("save Block - start");
-    // let game = getGame(gameLobbyID);
     getGame(gameLobbyID)
       .then(data => {
         let game = data;
@@ -58,7 +55,6 @@ function saveGame(gameLobbyID, playersID) {
     })
     newGame.save({ newGame })
       .then((result) => {
-        resolve('save Game end');
         return result;
       })
       .catch((err) => {
