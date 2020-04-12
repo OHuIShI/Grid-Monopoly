@@ -245,17 +245,6 @@ module.exports = class GameLobbby extends LobbyBase {
             }
         }
 
-        //Tell myself about everyone else already in the lobby
-        /*
-        connections.forEach(c => {
-            console.log("check");
-            if (connections[c].player.id != connection.player.id) {
-                console.log("spawn emit");
-                socket.emit('spawn', c.player);
-            }
-        });
-        */
-        //console.log("# of players:"+lobby.gameManager.CurrentPlayer);
         if (lobby.gameManager.CurrentPlayer == lobby.settings.maxPlayers) {
             console.log('UPDATETURN');
             connections[lobby.playersID[0]].player.SetIsMyTurn(true);
@@ -275,7 +264,7 @@ module.exports = class GameLobbby extends LobbyBase {
     }
 
     updateBalance(connection = Connection, data) {
-        console.log('updateBalance');
+        console.log('[ start ] updateBalance');
         let senderID = data.senderID;
         let receiverID = data.receiverID;
         let cost = data.cost;
@@ -298,10 +287,11 @@ module.exports = class GameLobbby extends LobbyBase {
                 connection.socket.broadcast.to(lobby.id).emit('updateBalance', data);
 
             })
+        console.log('[ end ] updateBalance');
     }
 
     updateLandData(connection = Connection, data) {
-        console.log('updateLandData');
+        console.log('[ start ] updateLandData');
         let landIndex = data.landIndex;
         let state = data.state;
         let id = data.id;
@@ -363,11 +353,11 @@ module.exports = class GameLobbby extends LobbyBase {
                 connection.socket.emit('updateLandData', data);
                 connection.socket.broadcast.to(lobby.id).emit('updateLandData', data);
             })
-
+        console.log('[ end ] updateLandData');
     }
 
     turnOver(connection = Connection) {
-        console.log('turnOver');
+        console.log('[ start ] turnOver');
         let lobby = this;
         let gameManager = lobby.gameManager;
         let connections = lobby.connections;
@@ -384,7 +374,6 @@ module.exports = class GameLobbby extends LobbyBase {
 
                 ranking.sort(function (a, b) {
                     console.log("sorting");
-
                     console.log(connections[b].player.assets - connections[a].player.assets);
                     return connections[b].player.assets - connections[a].player.assets;
                 })
@@ -445,14 +434,6 @@ module.exports = class GameLobbby extends LobbyBase {
             })
             console.log('after sorting');
             console.log(ranking);
-            /*
-            for (let i = 0; i < gameManager.CurrentPlayer; i++) {
-                if (connections[playersID[i]].player.assets > connections[playersID[winnerIndex]].player.assets) {
-                    winnerIndex = i;
-                }
-            }
-            console.log('gameOver, winner: ', connections[playersID[winnerIndex]].player.id);
-            */
 
             let returnData = {
                 winner: ranking[0],
@@ -472,13 +453,13 @@ module.exports = class GameLobbby extends LobbyBase {
                     connection.socket.emit('lobbyUpdate', returnLobbyData);
                     connection.socket.broadcast.to(lobby.id).emit('lobbyUpdate', returnLobbyData);
                 })
-
         }
+        console.log('[ end ] turnOver');
     }
 
     rollDices(connection = Connection) {
         let lobby = this;
-        console.log('rollDices');
+        console.log('[ start ] rollDices');
         let distDice = Math.floor(Math.random() * (2 * lobby.gameManager.mapLength)) + 1;
         //let distDice = 100;
         let dirDice = Math.floor(Math.random() * (4));
@@ -494,7 +475,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 0: {
                 y += dist;
                 if (y > maxLength) {
-                    //dist -= maxLength;
                     y = maxLength;
                     dist -= Math.abs(y - connection.player.position.y);
                 } else dist = 0;
@@ -503,7 +483,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 1: {
                 x += dist;
                 if (x > maxLength) {
-                    //dist -= maxLength;
                     x = maxLength;
                     dist -= Math.abs(x - connection.player.position.x);
                 } else dist = 0;
@@ -512,7 +491,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 2: {
                 y -= dist;
                 if (y < minLength) {
-                    //dist -= maxLength;
                     y = minLength;
                     dist -= Math.abs(y - connection.player.position.y);
                 } else dist = 0;
@@ -521,7 +499,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 3: {
                 x -= dist;
                 if (x < minLength) {
-                    //dist -= maxLength;
                     x = minLength;
                     dist -= Math.abs(x - connection.player.position.x);
                 } else dist = 0;
@@ -542,18 +519,20 @@ module.exports = class GameLobbby extends LobbyBase {
         }
 
         connection.player.updatePosition(returnData);
-        connection.player.showPlayerData();
+        console.log(connection.player.username + "'s position");
+        console.log("next Position = { x : " + x + ", y :" + y + "}");
         BlockManager.createNewBlock(this.gameLobbyID, 'updatePosition', returnData)
             .then(data => {
                 connection.socket.emit('updatePosition', data);
                 connection.socket.broadcast.to(lobby.id).emit('updatePosition', data);
             })
+        console.log('[ end ] rollDices');
     }
 
     GoBankrupt(connection = Connection, data) {
         let lobby = this;
         let connections = lobby.connections;
-        console.log('GoBankrupt');
+        console.log('[ start ] GoBankrupt');
         let id = data.id;
 
         connections[id].player.assets = 0;
@@ -577,12 +556,12 @@ module.exports = class GameLobbby extends LobbyBase {
                 connection.socket.emit('GoBankrupt', data);
                 connection.socket.broadcast.to(lobby.id).emit('GoBankrupt', data);
             })
-
+        console.log('[ end ] GoBankrupt');
     }
 
     selectDirection(connection = Connection, data) {
         let lobby = this;
-        console.log('selectDir');
+        console.log('[ start ] selectDir');
         let distDice = connection.player.dist;
         let dirDice = data.selectedDIR;
         let x = connection.player.position.x; // 당장 가야할 x
@@ -595,7 +574,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 0: {
                 y += dist;
                 if (y > maxLength) {
-                    //dist -= maxLength;
                     y = maxLength;
                     dist -= Math.abs(y - connection.player.position.y);
                 } else dist = 0;
@@ -604,7 +582,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 1: {
                 x += dist;
                 if (x > maxLength) {
-                    //dist -= maxLength;
                     x = maxLength;
                     dist -= Math.abs(x - connection.player.position.x);
                 } else dist = 0;
@@ -613,7 +590,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 2: {
                 y -= dist;
                 if (y < minLength) {
-                    //dist -= maxLength;
                     y = minLength;
                     dist -= Math.abs(y - connection.player.position.y);
                 } else dist = 0;
@@ -622,7 +598,6 @@ module.exports = class GameLobbby extends LobbyBase {
             case 3: {
                 x -= dist;
                 if (x < minLength) {
-                    //dist -= maxLength;
                     x = minLength;
                     dist -= Math.abs(x - connection.player.position.x);
                 } else dist = 0;
@@ -640,13 +615,14 @@ module.exports = class GameLobbby extends LobbyBase {
         }
 
         connection.player.updatePosition(returnData);
-        connection.player.showPlayerData();
+        console.log(connection.player.username + "'s position");
+        console.log("next Position = { x : " + x + ", y :" + y + "}");
 
         BlockManager.createNewBlock(this.gameLobbyID, 'updatePosition', returnData)
             .then(data => {
                 connection.socket.emit('updatePosition', data);
                 connection.socket.broadcast.to(lobby.id).emit('updatePosition', data);
             })
-
+        console.log('[ end ] selectDir');
     }
 }
