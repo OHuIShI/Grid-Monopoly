@@ -30,7 +30,7 @@ exports.Block = Block;
 let blockchains = {};
 //let blockchain: Block[] = [genesisBlock];
 const createGenesisBlock = (gameLobbyID, blockData) => {
-    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(), blockData, 0);
+    let genesisBlock = findBlock(0, CryptoJS.SHA256(gameLobbyID).toString(), getCurrentTimestamp(), blockData, 3);
     // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
     let blockchain = [genesisBlock];
     blockchains[gameLobbyID] = blockchain;

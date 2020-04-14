@@ -66,7 +66,7 @@ module.exports = class GameLobbby extends LobbyBase {
                         BlockManager.createGenesis(lobby.gameLobbyID, blockData);
                     })
                     .then(data => {
-                        console.log("EVERYONE READY!");
+                        //console.log("EVERYONE READY!");
                         lobby.lobbyState.currentState = lobby.lobbyState.GAME;
                         // spawn 전에 loadGame 부르고 씬 로딩되기 기다려야 함
                         socket.emit('loadGame');
@@ -147,7 +147,7 @@ module.exports = class GameLobbby extends LobbyBase {
     }
 
     initialSetting(connection = Connection) {
-        console.log("initialSetting");
+        //console.log("initialSetting");
         let lobby = this;
 
         // 호출 순서 중요
@@ -221,7 +221,7 @@ module.exports = class GameLobbby extends LobbyBase {
 
     initializeGameSetting(connection = Connection) {
         let lobby = this;
-        connection.socket.emit('initializeGameSetting');
+        //connection.socket.emit('initializeGameSetting');
     }
 
     addPlayer(connection = Connection) {
@@ -236,19 +236,19 @@ module.exports = class GameLobbby extends LobbyBase {
         //이걸 게임로비를 만들면 주석풀고 활용해야할듯 spawn말고 게임로비에 들어왔다는 신호로
         //socket.broadcast.to(lobby.id).emit('spawn', player); // Tell others
 
-        console.log("tell myself about everyone else:" + player.id);
+        //console.log("tell myself about everyone else:" + player.id);
 
         for (let c in connections) {
             if (connections[c].player.id != player.id) {
-                console.log("spawn emit:" + connections[c].player.id);
+                //console.log("spawn emit:" + connections[c].player.id);
                 socket.emit('spawn', connections[c].player);
             }
         }
 
         if (lobby.gameManager.CurrentPlayer == lobby.settings.maxPlayers) {
-            console.log('UPDATETURN');
+            //console.log('UPDATETURN');
             connections[lobby.playersID[0]].player.SetIsMyTurn(true);
-            console.log(lobby.playersID[0] + '\'s TURN');
+            //console.log(lobby.playersID[0] + '\'s TURN');
             lobby.gameManager.turnIndex = 0;
             lobby.gameManager.lapsToGo = lobby.gameManager.lapsToGo - 1;
             let returnData = {
@@ -373,12 +373,12 @@ module.exports = class GameLobbby extends LobbyBase {
                 for (var key in connections) ranking.push(key);
 
                 ranking.sort(function (a, b) {
-                    console.log("sorting");
-                    console.log(connections[b].player.assets - connections[a].player.assets);
+                    //console.log("sorting");
+                    //console.log(connections[b].player.assets - connections[a].player.assets);
                     return connections[b].player.assets - connections[a].player.assets;
                 })
-                console.log('after sorting');
-                console.log(ranking);
+                //console.log('after sorting');
+                //console.log(ranking);
 
                 let returnData = {
                     winner: ranking[0],
@@ -427,13 +427,13 @@ module.exports = class GameLobbby extends LobbyBase {
             for (var key in connections) ranking.push(key);
 
             ranking.sort(function (a, b) {
-                console.log("sorting");
+                //console.log("sorting");
 
-                console.log(connections[b].player.assets - connections[a].player.assets);
+                //console.log(connections[b].player.assets - connections[a].player.assets);
                 return connections[b].player.assets - connections[a].player.assets;
             })
-            console.log('after sorting');
-            console.log(ranking);
+            //console.log('after sorting');
+            //console.log(ranking);
 
             let returnData = {
                 winner: ranking[0],
@@ -444,7 +444,7 @@ module.exports = class GameLobbby extends LobbyBase {
                 state: lobby.lobbyState.currentState
             }
 
-            console.log(returnData);
+            //console.log(returnData);
             BlockManager.createNewBlock(this.gameLobbyID, 'gameOver', returnData)
                 .then(data => {
                     connection.socket.emit('gameOver', data);
@@ -519,8 +519,8 @@ module.exports = class GameLobbby extends LobbyBase {
         }
 
         connection.player.updatePosition(returnData);
-        console.log(connection.player.username + "'s position");
-        console.log("next Position = { x : " + x + ", y :" + y + "}");
+        //console.log(connection.player.username + "'s position");
+        //console.log("next Position = { x : " + x + ", y :" + y + "}");
         BlockManager.createNewBlock(this.gameLobbyID, 'updatePosition', returnData)
             .then(data => {
                 connection.socket.emit('updatePosition', data);
@@ -615,8 +615,8 @@ module.exports = class GameLobbby extends LobbyBase {
         }
 
         connection.player.updatePosition(returnData);
-        console.log(connection.player.username + "'s position");
-        console.log("next Position = { x : " + x + ", y :" + y + "}");
+        //console.log(connection.player.username + "'s position");
+        //console.log("next Position = { x : " + x + ", y :" + y + "}");
 
         BlockManager.createNewBlock(this.gameLobbyID, 'updatePosition', returnData)
             .then(data => {
