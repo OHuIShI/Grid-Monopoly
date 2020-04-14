@@ -12,40 +12,50 @@ function createGenesis(gameLobbyID, initialData)
             eventResult: initialData
         }
         let genesisBlock = createGenesisBlock(gameLobbyID, blockData);
+        // saveBlock(gameLobbyID, genesisBlock)
+        // .then((result) => {
+        //     //showBlock(genesisBlock);
+        //     resolve(genesisBlock);
+        // });
+        //showBlock(genesisBlock);
         saveBlock(gameLobbyID, genesisBlock)
+        .then((result)=>{
+            showBlock(genesisBlock);
+        })
         .then((result) => {
+            //showBlock(genesisBlock);
             resolve(genesisBlock);
         });
-
-        showBlock(genesisBlock);
     })
 }
 function createNewBlock(gameLobbyID, eventName, eventResult) {
     return new Promise(function (resolve, reject) {
-
         let blockData = {
             eventName: eventName,
             eventResult: eventResult
         }
         let newBlock = generateNextBlock(blockData, gameLobbyID);
+    
+        // saveBlock(gameLobbyID, newBlock)
+        // .then((result) => {
+        //     //showBlock(newBlock)
+        //     resolve(newBlock);
+        // });
+        //showBlock(newBlock);
         saveBlock(gameLobbyID, newBlock)
+        .then((result)=>{
+            showBlock(newBlock);
+        })
         .then((result) => {
+            //showBlock(newBlock)
             resolve(newBlock);
         });
-    
-        showBlock(newBlock);
     })
 }
 
 function showBlock(block) {
-    // public index: number;
-    // public hash: string;
-    // public previousHash: string;
-    // public timestamp: string;
-    // public data: Object;
-    // // 새롭게 추가되었다. 새롭게 block 의 요소로 추가되었다. 
-    // public difficulty: number;
-    // public nonce: number;
+    return new Promise(function (resolve, reject){
+
     let date = new Date(block.timestamp*1000);   
     let dataformat = date.getFullYear()+"."+(date.getMonth()+1)+"."+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
     let prevHash1 = block.previousHash.substr(0,32);
@@ -67,6 +77,8 @@ function showBlock(block) {
     console.log("                        \(                         ");
     console.log("                        \)                         ");
     console.log("                        \(                         ");
+    resolve();
+});
 }
 
 function getLastBlock(gameLobbyID){
