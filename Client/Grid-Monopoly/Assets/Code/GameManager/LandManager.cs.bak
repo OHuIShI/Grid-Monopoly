@@ -1,0 +1,84 @@
+﻿using Project.Utility;
+using Project.Utility.Attributes;
+using SocketIO;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Project {
+    [Serializable]
+    public class Land
+    {
+        public int id;
+        public string name;
+        public string ownerID;
+        public Price price;
+        public Status status;
+        public int totalValue;
+        public GameObject land;
+    }
+    [Serializable]
+    public class Price
+    {
+        public int land;
+        public int building;
+        public int contract;
+    }
+    [Serializable]
+    public class Status
+    {
+        public bool land;
+        public bool building;
+        public bool contract;
+    }
+    public class LandManager : MonoBehaviour
+    {
+        public static Land[] lands;
+        // Start is called before the first frame update
+        public void Start()
+        {
+            
+        }
+
+        // Update is called once per frame
+        public void Update()
+        {
+        
+        }
+
+        public void initializeLandSettings(SocketIOEvent E)
+        {
+            Debug.Log("initialize Land Settings");
+            //Debug.Log(E.data["items"]);
+            lands = JsonHelper.FromJson<Land>(E.data.ToString());
+            for (int i = 0; i < lands.Length; i++)
+            {
+                GameObject obj = gameObject.transform.GetChild(i).gameObject;
+                lands[i].land = obj;
+            }
+        }
+
+        public void updateLandData(SocketIOEvent E)
+        {
+            Debug.Log("update Land Data");
+            Debug.Log(E.data["state"]+ " " + E.data["id"]);
+            string state = E.data["state"].ToString().RemoveQuotes();
+            string id = E.data["id"].ToString().RemoveQuotes();
+            int landIndex = Int32.Parse(E.data["landIndex"].ToString().RemoveQuotes());
+
+            switch (state)
+            {
+                case "BuyLand":
+                    break;
+                case "Building":
+                    break;
+                case "Contract":
+                    break;
+                case "Acquire":
+                    break;
+            }
+        }
+    }
+
+}

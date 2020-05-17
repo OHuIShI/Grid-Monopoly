@@ -1,0 +1,414 @@
+﻿using Project;
+using Project.Networking;
+using Project.Utility.Attributes;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class GameManager : MonoBehaviour
+{
+    [SerializeField]
+    [GreyOut]
+    private float speed = 0.1f;
+    [SerializeField]
+    private GameObject arrowPrefab;
+
+    public float mapSize;
+
+    [SerializeField]
+    [GreyOut]
+    public static GameObject arrow1;
+    [SerializeField]
+    [GreyOut]
+    public static GameObject arrow2;
+
+    public GameObject buildingUI;
+    public NetworkIdentity ni;
+    public int landIndex;
+    public Land currentLand;
+
+    bool timer = false;
+    float _time = 0;
+    float waitTIme = 10f;
+    bool userInput = false;
+    int clickedLand = -1;
+    bool sellTimer = false;
+    float _sellTime = 0;
+    float sellWaitTime = 10f;
+
+    public enum State { BuyLand, Contract, Building, Acquire, Sell}
+    State state = State.BuyLand;
+
+    Ray ray;
+    RaycastHit hit;
+
+    void Update()
+    {
+        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 15.0f) && Input.GetMouseButtonDown(0))
+        {
+            if (hit.collider.tag == "Land")
+            {
+                string str = hit.collider.gameObject.name;
+                str = str.Substring(8);
+                clickedLand = int.Parse(str) - 1;
+                buildingUI.SetActive(true);
+                //Debug.Log("landIndex: " + clickedLand);
+            }
+        }
+        if (timer)
+        {
+            if (_time < waitTIme)
+            {
+                _time += Time.deltaTime;
+                if (buildingUI.GetComponent<ButtonControler>().clicked)
+                {
+                    userInput = buildingUI.GetComponent<ButtonControler>().result;
+                    Debug.Log(state);
+                }
+            }
+            else
+            {
+                buildingUI.GetComponent<ButtonControler>().clicked = true;
+            }
+        }
+		if (sellTimer)
+        {
+            if(_sellTime < sellWaitTime)
+            {
+                _sellTime += Time.deltaTime;
+                if (buildingUI.GetComponent<ButtonControler>().clicked)
+                {
+                    userInput = buildingUI.GetComponent<ButtonControler>().result;
+                }
+            }
+            else
+            {
+                // 매각 타임 종료
+                for (int i = 0; i < LandManager.lands.Length; i++)
+                {
+                    if (LandManager.lands[i].ownerID == NetworkClient.ClientID)
+                    {
+                        LandManager.lands[i].land.GetComponent<Outline>().OnDisable();
+                    }
+                }
+                _sellTime = 0;
+                userInput = false;
+                sellTimer = false;
+                buildingUI.GetComponent<ButtonControler>().clicked = false;
+                buildingUI.GetComponent<ButtonControler>().result = false;
+                Debug.Log("time over");
+                buildingUI.SetActive(false);
+            }
+        }
+        if (buildingUI.GetComponent<ButtonControler>().clicked)
+        {
+            // 처리 함수 call
+            TakeOver(buildingUI.GetComponent<ButtonControler>().result, state);
+            _time = 0;
+            userInput = false;
+            timer = false;
+            buildingUI.GetComponent<ButtonControler>().clicked = false;
+            buildingUI.GetComponent<ButtonControler>().result = false;
+            Debug.Log("time over");
+            buildingUI.SetActive(false);
+        }
+    }
+
+
+    public void UpdatePosition(NetworkIdentity ni,float DIR, float x, float y)
+    {
+        Debug.Log("GameManager - UpdatePosition");
+        float step = speed * Time.deltaTime;
+        Quaternion rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        Debug.Log("x = " + x + "y = " + y);
+
+        // 가야할 방향으로 player 고개 돌리기
+        // 방향주사위 눈 {0 :북 1 :동 2 : 남 3 :서 }
+        switch (DIR)
+        {
+            case 0: // 북쪽 -> +z
+                rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+                break;
+            case 1: // 동쪽 -> +x
+                rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+                break;
+            case 2: // 남쪽 -> -z
+                rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+                break;
+            case 3: // 서쪽 -> -x
+                rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+                break;
+        }
+        ni.transform.rotation = rotation;
+
+        // 가야할 position으로 움직이기
+        bool arrived = false;
+        while (!arrived)
+        {
+            ni.transform.position = Vector3.MoveTowards(ni.transform.position, new Vector3(x, 0, y), 0.01f);
+            if (Vector3.Distance(ni.transform.position, new Vector3(x, 0, y)) == 0) arrived = true;
+        }
+    }
+
+    public void MakeArrow(NetworkIdentity ni, float x, float y)
+    {
+        float halfLength = (int)(mapSize / 2);
+        float arrowHeight = 0.1f;
+        arrow1 = Instantiate(arrowPrefab, ni.transform);
+        arrow2 = Instantiate(arrowPrefab, ni.transform);
+
+
+        if (Math.Abs(x) == halfLength && Math.Abs(y) == halfLength) // 코너에 있는 경우
+        {
+            if(x == halfLength) // 오른쪽 변의 코너 두개
+            {
+                arrow1.transform.position += new Vector3(-1, arrowHeight, 0);
+                arrow1.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 90));
+            }
+            else // 왼쪽 변의 코너 두개
+            {
+                arrow1.transform.position += new Vector3(1, arrowHeight, 0);
+                arrow1.transform.rotation = Quaternion.Euler(new Vector3(90, 0, -90));
+            }
+
+            if(y == halfLength)
+            {
+                arrow2.transform.position += new Vector3(0, arrowHeight, -1);
+                arrow2.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 180));
+            }
+            else
+            {
+                arrow2.transform.position += new Vector3(0, arrowHeight, 1);
+                arrow2.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+            }
+        }
+        else if(Math.Abs(x) == halfLength) // 왼쪽, 오른쪽 변에 있는 경우
+        {
+            arrow1.transform.position += new Vector3(0, arrowHeight, -1);
+            arrow1.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 180));
+            arrow2.transform.position += new Vector3(0, arrowHeight, 1);
+            arrow2.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+        }
+        else if (Math.Abs(y) == halfLength) // 위, 아래 변에 있는 경우
+        {
+            arrow1.transform.position += new Vector3(-1, arrowHeight, 0);
+            arrow1.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 90));
+            arrow2.transform.position += new Vector3(1, arrowHeight, 0);
+            arrow2.transform.rotation = Quaternion.Euler(new Vector3(90, 0, -90));
+        }
+    }
+
+    public static void DeleteArrow()
+    {
+        Destroy(arrow1);
+        Destroy(arrow2);
+    }
+    
+	public void CallTakeOver(float x, float y)
+    {
+        landIndex = (int)x - 5 * (int)y + 12;
+        currentLand = LandManager.lands[landIndex];
+        ni = NetworkClient.serverObjects[NetworkClient.ClientID];
+
+        Debug.Log("TakeOver");
+        if (currentLand.ownerID == "") //빈 땅 
+        {
+            Debug.Log("EMPTY LAND");
+            if (ni.GetPlayerManager().getBalance() < currentLand.price.land)
+            {
+                ni.GetSocket().Emit("turnOver");
+            }
+            else
+            {
+				buildingUI.GetComponentInChildren<Text>().text = "빈땅 살래?";
+                buildingUI.SetActive(true);
+                timer = true;
+                state = State.BuyLand;
+            }
+        }
+        else if (currentLand.ownerID == NetworkClient.ClientID) // 내 땅
+        {
+            if (currentLand.status.contract)
+            {
+                Debug.Log("nothing to do");
+                ni.GetSocket().Emit("turnOver");
+            }
+            else if (currentLand.status.building)
+            {
+                Debug.Log("ask contract");
+                if (currentLand.price.contract > ni.GetPlayerManager().getBalance()) // 계약할 돈 부족
+                {
+                    ni.GetSocket().Emit("turnOver");
+                }
+                else // 계약 가능
+                {
+					buildingUI.GetComponentInChildren<Text>().text = "매매방지 계약할래?";
+                    buildingUI.SetActive(true);
+                    state = State.Contract;
+                    timer = true;
+                }
+            }
+            else if (currentLand.status.land)
+            {
+                Debug.Log("ask build building");
+                if (currentLand.price.building > ni.GetPlayerManager().getBalance())
+                {
+                    Debug.Log("cannot build building, turnOver");
+                    ni.GetSocket().Emit("turnOver");
+                }
+                else // 건물 짓기 가능
+                {
+                    buildingUI.GetComponentInChildren<Text>().text = "내 땅에 건물 지을래?";
+                    buildingUI.SetActive(true);
+                    Debug.Log("set state to building");
+                    state = State.Building;
+                    Debug.Log(state);
+                    timer = true;
+                }
+            }
+            else
+            {
+                Debug.Log("error occured");
+            }
+        }
+        else if (currentLand.ownerID != NetworkClient.ClientID) // 남 땅
+        {
+            int fee = 4 * currentLand.totalValue;
+            Debug.Log("Toll Fee: " + fee);
+            //ni.GetSocket().Emit("PayAToll", new JSONObject(JsonUtility.ToJson()));
+            if (ni.GetPlayerManager().getBalance() < fee)
+            {
+                Debug.Log("no money");
+                // 통행료도 못냄.. 매각/파산
+				state = State.Sell;
+                // 매각할 수 있는 자기 땅 하이라이팅
+                for(int i=0; i< LandManager.lands.Length; i++)
+                {
+                    if(LandManager.lands[i].ownerID == NetworkClient.ClientID)
+                    {
+                        LandManager.lands[i].land.GetComponent<Outline>().OnEnable();
+                        LandManager.lands[i].land.GetComponent<Outline>().UpdateMaterialProperties();
+                    }
+                }
+                buildingUI.GetComponentInChildren<Text>().text = "매각 할래?";
+                sellTimer = true;
+            }
+            else
+            {
+				MoneyData moneyData = new MoneyData();
+                moneyData.cost = fee;
+                moneyData.senderID = NetworkClient.ClientID;
+                moneyData.receiverID = currentLand.ownerID;
+                int currentBalance = ni.GetPlayerManager().getBalance();
+                ni.GetSocket().Emit("updateBalance", new JSONObject(JsonUtility.ToJson(moneyData)));
+
+                currentBalance -= fee;
+
+                // 인수할래? UI 띄우기
+                int cost = currentLand.totalValue * 2;
+                if (currentBalance < cost)
+                {
+                    ni.GetSocket().Emit("turnOver");
+                }
+                else
+                {
+                    buildingUI.GetComponentInChildren<Text>().text = "인수 할래?";
+                    buildingUI.SetActive(true);
+                    timer = true;
+                    state = State.Acquire;
+                }
+            }            
+        }
+    }
+
+    public void TakeOver(bool result, State _state)
+    {
+        if(!result)
+        {
+            // turnover 넘기기
+            ni.GetSocket().Emit("turnOver");
+        }
+        else
+        {
+            MoneyData moneyData = new MoneyData();
+			LandData landData = new LandData();
+            switch (_state)
+            {
+                case State.BuyLand:
+                    Debug.Log("TakeOver - BuyLand");
+                    moneyData.cost = currentLand.price.land;
+                    moneyData.senderID = NetworkClient.ClientID;
+                    moneyData.receiverID = "";
+                    landData.state = "BuyLand";
+                    landData.landIndex = landIndex;
+                    landData.id = NetworkClient.ClientID;
+                    ni.GetSocket().Emit("updateBalance", new JSONObject(JsonUtility.ToJson(moneyData)));
+                    ni.GetSocket().Emit("updateLandData", new JSONObject(JsonUtility.ToJson(landData)));
+                    break;
+                case State.Building:
+                    Debug.Log("TakeOver - Building");
+                    landData.landIndex = landIndex;
+                    landData.state = "Building";
+                    moneyData.senderID = currentLand.ownerID;
+                    moneyData.cost = currentLand.price.building;
+                    ni.GetSocket().Emit("updateLandData", new JSONObject(JsonUtility.ToJson(landData)));
+                    ni.GetSocket().Emit("updateBalance", new JSONObject(JsonUtility.ToJson(moneyData)));
+                    break;
+                case State.Contract:
+                    Debug.Log("TakeOver - Contract");
+                    landData.landIndex = landIndex;
+                    landData.state = "Contract";
+                    moneyData.senderID = currentLand.ownerID;
+                    moneyData.cost = currentLand.price.contract;
+                    ni.GetSocket().Emit("updateLandData", new JSONObject(JsonUtility.ToJson(landData)));
+                    ni.GetSocket().Emit("updateBalance", new JSONObject(JsonUtility.ToJson(moneyData)));
+                    break;
+                case State.Acquire:
+                    Debug.Log("TakeOver - Acquire");
+                    moneyData.cost = currentLand.totalValue * 2;
+                    moneyData.senderID = NetworkClient.ClientID;
+                    moneyData.receiverID = currentLand.ownerID;
+                    landData.state = "Acquire";
+                    landData.landIndex = landIndex;
+                    landData.id = NetworkClient.ClientID;
+                    ni.GetSocket().Emit("updateBalance", new JSONObject(JsonUtility.ToJson(moneyData)));
+                    ni.GetSocket().Emit("updateLandData", new JSONObject(JsonUtility.ToJson(landData)));
+                    break;
+                case State.Sell:
+                    Debug.Log("TakeOver - sell");
+                    LandManager.lands[landIndex].land.GetComponent<Outline>().OnDisable();
+                    moneyData.cost = currentLand.totalValue;
+                    moneyData.receiverID = NetworkClient.ClientID;
+                    landData.state = "Sell";
+                    landData.landIndex = landIndex;
+                    landData.id = "";
+                    ni.GetSocket().Emit("updateBalance", new JSONObject(JsonUtility.ToJson(moneyData)));
+                    ni.GetSocket().Emit("updateLandData", new JSONObject(JsonUtility.ToJson(landData)));
+                    break;
+            }
+            ni.GetSocket().Emit("turnOver");
+        }
+    }
+
+    [Serializable]
+    public class LandData
+    {
+        public int landIndex;
+        public string state;
+        public string id;
+    }
+
+    [Serializable]
+    public class MoneyData
+    {
+        public string senderID;
+        public string receiverID;
+        public int cost;
+    }
+}
+
+
+

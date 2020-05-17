@@ -1,0 +1,200 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using SocketIO;
+using Project.Utility;
+using System;
+using Project.Utility.Attributes;
+
+namespace Project.Networking
+{
+    public class NetworkClient : SocketIOComponent
+    {
+        [Header("Network Client")]
+        [SerializeField]
+        private Transform networkContainer;
+        [SerializeField]
+        private GameObject playerPrefab;
+
+        public GameObject RollButton;
+        public GameObject gameManager;
+        public GameObject landManager;
+        public GameObject UserInfo;
+        public static string ClientID { get; private set; }
+
+        public static Dictionary<string, NetworkIdentity> serverObjects;
+
+        // Start is called before the first frame update
+        public override void Start()
+        {
+            base.Start();
+            initialize();
+            setupEvents();
+        }
+
+        // Update is called once per frame
+        public override void Update()
+        {
+            base.Update();
+        }
+
+        private void initialize()
+        {
+            serverObjects = new Dictionary<string, NetworkIdentity>();
+        }
+
+        private void setupEvents()
+        {
+            On("open", (E) =>
+            {
+                Debug.Log("Connection made to the server");
+            });
+
+            On("register", (E) =>
+            {
+                ClientID = E.data["id"].ToString().RemoveQuotes();
+                Debug.LogFormat("Our Client's ID ({0})", ClientID);
+            });
+
+            On("initializeGameSetting", (E) =>
+            {
+                //initialize game field 
+                landManager.GetComponent<LandManager>().initializeLandSettings(E);
+            });
+
+            On("spawn", (E) =>
+            {
+                //Handling all spawning all players
+                //Passed Data
+                string id = E.data["id"].ToString().RemoveQuotes();
+                int order = Int32.Parse(E.data["order"].ToString().RemoveQuotes());
+
+                GameObject go = Instantiate(playerPrefab, networkContainer);
+                go.name = string.Format("Player ({0})", id);
+                GameObject playerCharacter = go.transform.GetChild(order).gameObject;
+                playerCharacter.SetActive(true);
+
+                NetworkIdentity ni = go.GetComponent<NetworkIdentity>();
+                ni.GetPlayerManager().setColor(playerCharacter.transform.Find("Color").gameObject.GetComponent<Renderer>().material.color);
+                ni.GetPlayerManager().setUserInfo(UserInfo.transform.GetChild(order).gameObject);
+                ni.GetPlayerManager().setAssets(Int32.Parse(E.data["assets"].ToString().RemoveQuotes()));
+                ni.GetPlayerManager().setBalance(Int32.Parse(E.data["balance"].ToString().RemoveQuotes()));
+                ni.SetControllerID(id);
+                ni.SetSocketReference(this);
+                serverObjects.Add(id, ni);
+            });
+
+            On("disconnected", (E) =>
+            {
+                string id = E.data["id"].ToString().RemoveQuotes();
+
+                GameObject go = serverObjects[id].gameObject;
+                Destroy(go); //Remove from game
+                serverObjects.Remove(id); //Remove from memory
+            });
+
+            On("updatePosition", (E) =>
+            {
+                string id = E.data["id"].ToString().RemoveQuotes();
+                float DIR = E.data["DIR"].f; // 방향주사위 눈 {0 :북 1 :동 2 : 남 3 :서 }
+                float DIST = E.data["DIST"].f; // 거리주사위 눈 
+                float x = E.data["x"].f; // 당장 가야할 dx (항상 양수)
+                float y = E.data["y"].f; // 당장 가야할 dy (항상 양수)
+                float dist = E.data["dist"].f; // 남은 이동 거리 횟수
+
+                NetworkIdentity ni = serverObjects[id];
+                GameManager.DeleteArrow();
+                gameManager.GetComponent<GameManager>().UpdatePosition(ni, DIR, x, y);
+
+                if(dist == 0 && ni.IsMyTurn())
+                {
+                    // 지금 당장은 turn 종료 코드
+                    // 나중에는 여기에 인수 관련 함수 넣으면 됨
+                    Debug.Log("call takeover");
+                    gameManager.GetComponent<GameManager>().CallTakeOver(x,y);
+                    //Debug.Log("call turnover");
+                }
+                else if(dist != 0 && ni.IsMyTurn())
+                {
+                    gameManager.GetComponent<GameManager>().MakeArrow(ni, x, y);
+                }
+
+            });
+            On("updateBalance", (E) =>
+            {
+                Debug.Log("updateBalanece");
+                string sender = E.data["senderID"].ToString().RemoveQuotes();
+                string receiver = E.data["receiverID"].ToString().RemoveQuotes();
+                if(receiver != "")
+                {
+                    NetworkIdentity receiver_ni = serverObjects[receiver];
+                    receiver_ni.GetPlayerManager().Deposit(Int32.Parse(E.data["cost"].ToString().RemoveQuotes()));
+                }
+                if(sender != "")
+                {
+                    NetworkIdentity sender_ni = serverObjects[sender];
+                    sender_ni.GetPlayerManager().Withdraw(Int32.Parse(E.data["cost"].ToString().RemoveQuotes()));
+                }                
+            });
+            On("updateLandData", (E) =>
+            {
+                landManager.GetComponent<LandManager>().updateLandData(E);
+            });
+            // 1 Turn Start
+            On("updateTurn", (E) =>
+            {
+                string id = E.data["id"].ToString().RemoveQuotes();
+                NetworkIdentity ni = serverObjects[id];
+                ni.checkIsMyTurn(id);
+                Debug.Log("updateTurn");
+
+                if (ni.IsMyTurn())
+                {
+                    Debug.Log("ISmYTURN");
+                    RollButton.SetActive(true);
+                }
+            });
+            On("gameOver", (E) =>
+            {
+                Debug.Log("GAME OVER");
+                string winnerID = E.data["winner"].ToString().RemoveQuotes();
+                NetworkIdentity winner = serverObjects[winnerID];
+                Debug.Log("win: " + winnerID);
+                winner.GetPlayerManager().SetUserState("WIN");
+                
+             });
+            On("GoBankrupt", (E) =>
+            {
+                string id = E.data["id"].ToString().RemoveQuotes();
+                NetworkIdentity ni = serverObjects[id];
+                if (id == ClientID)
+                {
+                    ni.GetSocket().Emit("turnOver");
+                }
+                ni.GetPlayerManager().setAssets(0);
+                ni.GetPlayerManager().setBalance(0);
+                landManager.GetComponent<LandManager>().resetLandSettings(id);
+                ni.GetPlayerManager().SetUserState("BANKRUPT");
+            });
+        }
+
+        public void AttemptToJoinLobby()
+        {
+            Emit("joinGame");
+        }
+    }
+
+    [Serializable]
+    public class Player
+    {
+        public string id;
+        public Position position;
+    }
+
+    [Serializable]
+    public class Position
+    {
+        public float x;
+        public float y;
+    }
+}
